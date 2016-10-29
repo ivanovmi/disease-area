@@ -8,6 +8,7 @@ import logging
 from config import Config
 from flask import Flask
 from flask import request, render_template, redirect, url_for
+from flask_googlemaps import GoogleMaps
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -27,8 +28,8 @@ log = logging.getLogger("app")
 log.addHandler(console)
 log.setLevel(logging.DEBUG)
 
-navigation = ['district','population', 'hospital', 'disease' ]
-
+navigation = ['district', 'population', 'hospital', 'disease']
+GoogleMaps(app, key=app.config['GMAPS_KEY'])
 
 @app.route('/', methods=['GET', 'POST'])
 def index():

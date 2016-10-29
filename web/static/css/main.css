@@ -1,11 +1,17 @@
 /* custom styles */
 
 .container {
-  max-width: 500px;
+  max-width: 100%;
 }
 
-body{margin:40px;}
+body{
+  margin:40px;
+}
 
+.map-container{
+  max-width: 100%;
+  border: 1px solid black;
+}
 
 .btn-circle {
   width: 30px;
