@@ -5,11 +5,11 @@
 }
 
 body{
-  margin:40px;
+  margin: 5px;
 }
 
 .map-container{
-  max-width: 100%;
+  max-width: 100% !important;
   border: 1px solid black;
 }
 

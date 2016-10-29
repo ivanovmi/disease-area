@@ -11,9 +11,7 @@
 {% include "_navigation.html" %}
 
 <hr>
-    <div class="map-container">
-        {{googlemap("my_awesome_map", lat=0.23234234, lng=-0.234234234, markers=[(0.12, -0.45345)], style="width=500px;")}}
-    </div>
+    {{googlemap("my_awesome_map", lat=51.50, lng=46.0, zoom=10, markers=[(0.12, -0.45345)], style="height:450px;width:1138px;margin:0;")}}
 
 
 {% endblock %}
