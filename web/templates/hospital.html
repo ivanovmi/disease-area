@@ -7,9 +7,9 @@
 
 <div class="text-center">
     <form class="form" action="/hospital" method="POST">
-        {{ text_input('name', 'Enter a hospital name', True) }}
-        {{ text_input('address', 'Enter a hospital address', True) }}
-        {{ text_input('phone', 'Enter a hospital phone', True) }}
+        {{ text_input('name', 'Введите название больницы', True) }}
+        {{ text_input('address', 'Введите адрес больницы', True) }}
+        {{ text_input('phone', 'Введите адрес сайта больницы', True) }}
         {{ select('district') }}
         {{ submit('add') }}
     </form>

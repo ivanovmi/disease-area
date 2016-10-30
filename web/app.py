@@ -33,17 +33,6 @@ navigation = ['district', 'population', 'hospital', 'disease']
 GoogleMaps(app, key=app.config['GMAPS_KEY'])
 
 
-def _get_markers():
-    markers = []
-    hospitals = _get_all_hospitals()
-    for hospital in hospitals:
-        #    'infobox': "Hello I am < b style='color:green;'>B< / b >!"
-        h = {'icon': icons.dots.red}
-        h['lat'], h['lng'] = hospital.coordinates.split('; ')
-        h['infobox'] = "{}<br><b>Адрес:</b> {}<br><a href={} target='_blank'>Сайт учреждения</a>".format(hospital.name, hospital.address, hospital.phone)
-        markers.append(h)
-    return markers
-
 @app.route('/', methods=['GET', 'POST'])
 def index():
     markers = _get_markers()
@@ -210,6 +199,16 @@ def _get_all_hospitals():
 
 def _get_district_by_id(district_id):
     return District.query.filter_by(id=district_id).first() if district_id else None
+
+def _get_markers():
+    markers = []
+    hospitals = _get_all_hospitals()
+    for hospital in hospitals:
+        h = {'icon': icons.dots.red}
+        h['lat'], h['lng'] = hospital.coordinates.split('; ')
+        h['infobox'] = "{}<br><b>Адрес:</b> {}<br><a href={} target='_blank'>Сайт учреждения</a>".format(hospital.name, hospital.address, hospital.phone)
+        markers.append(h)
+    return markers
 
 
 if __name__ == '__main__':

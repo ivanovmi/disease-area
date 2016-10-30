@@ -1,9 +1,23 @@
 {% set active_page = request.path %}
 <ul class="nav nav-pills text-center">
 {% for nav in navigation %}
+    {% if nav == 'district' %}
+        {% set runav = 'Район' %}
+    {% elif nav == 'population' %}
+        {% set runav = 'Население' %}
+    {% elif nav == 'hospital' %}
+        {% set runav = 'Больница' %}
+    {% elif nav == 'disease' %}
+        {% set runav = 'Болезнь' %}
+    {% endif %}
     <li role="presentation" {%- if active_page==url_for(nav) %} class="active" {% endif %}>
-        <a href="{{url_for(nav)}}">{{nav|capitalize}}</a>
+        <a href="{{url_for(nav)}}">{{runav}}</a>
     </li>
 {% endfor %}
+    {% if active_page!=url_for('index') %}
+        <li role="presentation" style="float: right;">
+            <a href="{{ url_for('index') }}">На главную</a>
+        </li>
+    {% endif %}
 </ul>
 <br>

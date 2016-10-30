@@ -7,12 +7,12 @@
 
 <div class="text-center">
     <form class="form" action="/population" method="POST">
-        {{ text_input('year','Enter a year', True) }}
-        {{ text_input('women','Enter amount of women') }}
-        {{ text_input('men','Enter amount of men') }}
-        {{ text_input('children','Enter amount of children') }}
-        {{ text_input('employable_men','Enter amount of employable men') }}
-        {{ text_input('employable_women','Enter amount of employable women') }}
+        {{ text_input('year','Введите год', True) }}
+        {{ text_input('women','Введите число женщин') }}
+        {{ text_input('men','Введите число мужчин') }}
+        {{ text_input('children','Введите число детей') }}
+        {{ text_input('employable_men','Введите число работающих мужчин') }}
+        {{ text_input('employable_women','Введите число работающих женщин') }}
         {{ select('district') }}
         {{ submit('add') }}
     </form>
