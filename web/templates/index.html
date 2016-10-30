@@ -1,5 +1,9 @@
 {% extends "_base.html" %}
 
+{% block js %}
+    {{ gmap.js }}
+{% endblock %}
+
 {% block content %}
 
 <div class="text-center">
@@ -11,7 +15,6 @@
 {% include "_navigation.html" %}
 
 <hr>
-    {{googlemap("my_awesome_map", lat=51.50, lng=46.0, zoom=10, markers=[(0.12, -0.45345)], style="height:450px;width:1138px;margin:0;")}}
-
+{{ gmap.html }}
 
 {% endblock %}

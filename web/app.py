@@ -8,7 +8,8 @@ import logging
 from config import Config
 from flask import Flask
 from flask import request, render_template, redirect, url_for
-from flask_googlemaps import GoogleMaps
+from flask_googlemaps import GoogleMaps, Map, icons
+
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -31,9 +32,28 @@ log.setLevel(logging.DEBUG)
 navigation = ['district', 'population', 'hospital', 'disease']
 GoogleMaps(app, key=app.config['GMAPS_KEY'])
 
+
+def _get_markers():
+    markers = []
+    hospitals = _get_all_hospitals()
+    for hospital in hospitals:
+        #    'infobox': "Hello I am < b style='color:green;'>B< / b >!"
+        h = {'icon': icons.dots.red}
+        h['lat'], h['lng'] = hospital.coordinates.split('; ')
+        h['infobox'] = "{}<br><b>Адрес:</b> {}<br><a href={} target='_blank'>Сайт учреждения</a>".format(hospital.name, hospital.address, hospital.phone)
+        markers.append(h)
+    return markers
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    return render_template('index.html', navigation=navigation)
+    markers = _get_markers()
+    gmap = Map("disease_map",
+               lat=51.50, lng=46.0,
+               zoom=10, markers=markers,
+               style="height:450px;width:1138px;margin:0;",
+               cluster=True,
+               cluster_gridsize=10)
+    return render_template('index.html', navigation=navigation, gmap=gmap)
 
 
 @app.route('/district', methods=['GET', 'POST'])
