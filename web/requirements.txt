@@ -12,4 +12,4 @@ itsdangerous==0.24
 requests==2.11.1
 requestsexceptions==1.1.3
 
-yandex-maps==0.7
+# yandex-maps==0.7
