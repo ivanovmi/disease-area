@@ -1,1 +1,1 @@
-web: cd web; source secrets; python3 app.py
+web: python3 app.py
