@@ -1,0 +1,27 @@
+{% extends "_base.html" %}
+
+{% block js %}
+<!--
+ <script>
+
+ var map = new GMaps({
+     el: '#map',
+     lat: 51.50,
+     lng: 46.0,
+     zoom: 10
+ });
+</script>-->
+{% endblock %}
+
+{% block content %}
+
+    <br>
+
+{% include "_navigation.html" %}
+
+<hr>
+    <div class="map-container" align="center">
+    </div>
+<!--<div id="map"></div>-->
+
+{% endblock %}

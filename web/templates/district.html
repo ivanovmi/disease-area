@@ -1,28 +1,36 @@
 {% extends "_base.html" %}
 {% block content %}
-{% include "_navigation.html" %}
 {% from "_macro.html" import text_input with context %}
 {% from "_macro.html" import submit with context %}
 {% from "_macro.html" import select with context %}
 
-<div class="text-center">
-    <form class="form" action="/district" method="POST">
-        {{ text_input('name','Введите название района', True) }}
-        {{ text_input('coordinates','Введите координаты района') }}
-        {{ submit('add') }}
-    </form>
-</div>
-
-{% if districts %} <hr/> {% endif %}
-
-{% for district in districts %}
-<form action="/district/delete" method="POST">
-    <div class="form-group">
-        <div class="well well-sm">
-            {{ submit('delete') }} <strong>{{district.name}}</strong>
-            <input type="hidden" name="district_id" value="{{district.id}}">
+<div class="container">
+    <div class="text-center">
+        {% include "_navigation.html" %}
+        <button type="button" class="btn btn-info"
+                data-toggle="collapse"
+                data-target="#collapse-input">Добавить
+        </button>
+        <div id="collapse-input" class="collapse out">
+            <hr/>
+            <form class="form" action="/district" method="POST">
+                {{ text_input('name','Введите название района...', True) }}
+                {{ submit('add') }}
+            </form>
         </div>
     </div>
-</form>
-{% endfor %}
+</div>
+<br>
+<div class="input-container">
+    {% for district in districts %}
+    <form action="/district/delete" method="POST">
+        <div class="form-group">
+            <div class="well well-sm">
+                {{ submit('delete') }} <strong>{{district.name}}</strong>
+                <input type="hidden" name="district_id" value="{{district.id}}">
+            </div>
+        </div>
+    </form>
+    {% endfor %}
+</div>
 {% endblock %}

@@ -1,23 +1,21 @@
 {% set active_page = request.path %}
 <ul class="nav nav-pills text-center">
 {% for nav in navigation %}
-    {% if nav == 'district' %}
-        {% set runav = 'Район' %}
-    {% elif nav == 'population' %}
-        {% set runav = 'Население' %}
-    {% elif nav == 'hospital' %}
-        {% set runav = 'Больница' %}
-    {% elif nav == 'disease' %}
-        {% set runav = 'Болезнь' %}
+    {% if nav == 'markers_map' %}
+        {% set runav = 'Структура здравоохранения' %}
+    {% elif nav == 'disease_map' %}
+        {% set runav = 'Заболеваемость' %}
+    {% elif nav == 'population_map' %}
+        {% set runav = 'Демография населения' %}
+    {% elif nav == 'analysis' %}
+        {% set runav = 'Прогноз' %}
     {% endif %}
-    <li role="presentation" {%- if active_page==url_for(nav) %} class="active" {% endif %}>
-        <a href="{{url_for(nav)}}">{{runav}}</a>
+    {% set url = url_for(nav|replace(' ','_')) %}
+    <li role="presentation" {%- if active_page==url%} class="active" {% endif %}>
+        <a href="{{url}}">{{runav|capitalize}}</a>
     </li>
 {% endfor %}
-    {% if active_page!=url_for('index') %}
-        <li role="presentation" style="float: right;">
-            <a href="{{ url_for('index') }}">На главную</a>
-        </li>
-    {% endif %}
+    <li role="presentation" style="float: right;" class="btn">
+        <a href="{{ url_for('login') }}">Вход</a>
+    </li>
 </ul>
-<br>

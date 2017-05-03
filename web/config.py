@@ -2,6 +2,8 @@ import os
 
 
 class Config(object):
+    ADMIN_USERNAME = "admin"
+    ADMIN_PASSWORD = "admin"
     SECRET_KEY = os.environ['SECRET_KEY']
     CSRF_ENABLED = True
     DEBUG = False #os.environ['DEBUG']

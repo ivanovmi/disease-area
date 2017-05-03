@@ -1,28 +1,39 @@
 {% extends "_base.html" %}
 {% block content %}
-{% include "_navigation.html" %}
 {% from "_macro.html" import text_input with context %}
 {% from "_macro.html" import select with context %}
 {% from "_macro.html" import submit with context %}
 
-<div class="text-center">
-    <form class="form" action="/hospital" method="POST">
-        {{ text_input('name', 'Введите название больницы', True) }}
-        {{ text_input('address', 'Введите адрес больницы', True) }}
-        {{ text_input('phone', 'Введите адрес сайта больницы', True) }}
-        {{ select('district') }}
-        {{ submit('add') }}
-    </form>
-</div>
-{% if hospitals %} <hr/> {% endif %}
-{% for hospital in hospitals %}
-<form action="/hospital/delete" method="POST">
-    <div class="form-group">
-        <div class="well well-sm">
-            {{ submit('delete') }} <strong> {{hospital.name}} - {{hospital.district}}</strong>
-            <input type="hidden" name="hospital_id" value="{{hospital.id}}">
+<div class="container">
+    <div class="text-center">
+        {% include "_navigation.html" %}
+        <button type="button" class="btn btn-info"
+                data-toggle="collapse"
+                data-target="#collapse-input">Добавить
+        </button>
+        <div id="collapse-input" class="collapse out">
+            <hr/>
+            <form class="form" action="/hospital" method="POST">
+                {{ text_input('name', 'Введите название больницы..', True) }}
+                {{ text_input('address', 'Введите адрес больницы..', True) }}
+                {{ text_input('phone', 'Введите адрес сайта больницы..', True) }}
+                {{ select('district') }}
+                {{ submit('add') }}
+            </form>
         </div>
     </div>
-</form>
-{% endfor %}
+</div>
+<br>
+<div class="input-container">
+    {% for hospital in hospitals %}
+    <form action="/hospital/delete" method="POST">
+        <div class="form-group">
+            <div class="well well-sm">
+                {{ submit('delete') }} <strong> {{hospital.name}} - {{hospital.district}}</strong>
+                <input type="hidden" name="hospital_id" value="{{hospital.id}}">
+            </div>
+        </div>
+    </form>
+    {% endfor %}
+</div>
 {% endblock %}

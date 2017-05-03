@@ -1,4 +1,5 @@
 Flask==0.11.1
+Flask-WTF==0.11
 flask-googlemaps
 googlemaps
 Flask-SQLAlchemy==2.1
@@ -10,3 +11,5 @@ gunicorn==19.6.0
 itsdangerous==0.24
 requests==2.11.1
 requestsexceptions==1.1.3
+
+yandex-maps==0.7

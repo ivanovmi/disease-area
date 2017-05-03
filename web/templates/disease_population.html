@@ -1,0 +1,69 @@
+{% extends "_base.html" %}
+{% block content %}
+{% from "_macro.html" import text_input with context %}
+{% from "_macro.html" import submit with context %}
+{% from "_macro.html" import select with context %}
+
+<div class="container">
+    <div class="text-center">
+        {% include "_navigation.html" %}
+        <button type="button" class="btn btn-info from-group"
+                data-toggle="collapse"
+                data-target="#collapse-input">Expand/Collapse control
+        </button>
+        <div id="collapse-input" class="collapse out">
+            <form class="form" action="/disease_population" method="POST">
+                <hr/>
+                {{ text_input('year','Enter a year', True) }}
+                {{ text_input('children','Enter amount of children') }}
+                {{ text_input('children_observed','Enter amount of observed children') }}
+                {{ text_input('adults','Enter amount of adults') }}
+                {{ text_input('adults_observed','Enter amount of observedi adults') }}
+                {{ select('disease') }}
+                {{ select('hospital') }}
+                {{ submit('add') }}
+            </form>
+        </div>
+    </div>
+</div>
+{% if disease_populations %}
+<div class="data-container">
+    <h2>Disease population</h2>
+    <p>The table represents data about diseases</p>
+    <div class="table-responsive">
+        <table class="table table-condensed">
+            <thead>
+            <tr>
+                <th></th>
+                <th>#</th>
+                <th>Year</th>
+                <th>Hosptial</th>
+                <th>Disease</th>
+                <th>Adults</th>
+                <th>Children</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for disease_population in disease_populations %}
+            <tr>
+                <form action="/disease_population/delete" method="POST">
+                    <input type="hidden" name="disease_population_id"
+                           value="{{disease_population.id}}">
+                    <td>{{ submit('delete') }}</td>
+                    <td>{{disease_population.id}}</td>
+                    <td>{{disease_population.year}}</td>
+                    <td>{{disease_population.hospital.name}}</td>
+                    <td>{{disease_population.disease.name}}</td>
+                    <td>{{disease_population.adults}}</td>
+                    <td>{{disease_population.children}}</td>
+                </form>
+            </tr>
+            </tbody>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
+{% endif %}
+{% endblock %}
+

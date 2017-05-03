@@ -1,34 +1,160 @@
 {% extends "_base.html" %}
 {% block content %}
-{% include "_navigation.html" %}
 {% from "_macro.html" import text_input with context %}
 {% from "_macro.html" import submit with context %}
 {% from "_macro.html" import select with context %}
+{% from "_macro.html" import file_input with context %}
 
-<div class="text-center">
-    <form class="form" action="/population" method="POST">
-        {{ text_input('year','Введите год', True) }}
-        {{ text_input('women','Введите число женщин') }}
-        {{ text_input('men','Введите число мужчин') }}
-        {{ text_input('children','Введите число детей') }}
-        {{ text_input('employable_men','Введите число работающих мужчин') }}
-        {{ text_input('employable_women','Введите число работающих женщин') }}
-        {{ select('district') }}
-        {{ submit('add') }}
-    </form>
-</div>
-
-{% if populations %} <hr/> {% endif %}
-
-{% for population in populations %}
-<form action="/population/delete" method="POST">
-    <div class="form-group">
-        <div class="well well-sm">
-            {{ submit('delete') }} <strong> {{population.year}} </strong> - {{population.district}} all: {{population.all}} adults:{{population.adults}} children:{{population.children}}
-            <input type="hidden" name="population_id" value="{{population.id}}">
+<div class="container">
+    <div class="text-center">
+        {% include "_navigation.html" %}
+        <button type="button" class="btn btn-info form-group"
+                data-toggle="collapse"
+                data-target="#collapse-input">Expand/Collapse control
+        </button>
+        <div id="collapse-input" class="collapse out">
+            <hr/>
+            <form class="form" action="/population" method="POST">
+                {{ text_input('year','Enter a year', True) }}
+                {{ text_input('women','Enter amount of women') }}
+                {{ text_input('men','Enter amount of men') }}
+                {{ text_input('children','Enter amount of children') }}
+                {{ text_input('employable_men','Enter amount of employable men') }}
+                {{ text_input('employable_women','Enter amount of employable women') }}
+                {{ select('district') }}
+                {{ submit('add') }}
+            </form>
+        </div>
+        <div>
+            <hr/>
+            <fieldset>
+                <legend>Воспроизводство населения</legend>
+            <form class="form" action="/population" method="POST" enctype="multipart/form-data">
+                <input type=file name="reprod_file">
+                <input type=submit value=Upload>
+                {#{ file_input('reprod_file') }#}
+                </form>
+            </fieldset>
+        </div>
+        <div>
+            <hr/>
+            <fieldset>
+                <legend>Браки</legend>
+            <form class="form" action="/population" method="POST" enctype="multipart/form-data">
+                <input type=file name="marriage_file">
+                <input type=submit value=Upload>
+                {#{ file_input('reprod_file') }#}
+            </form>
+                </fieldset>
+        </div>
+        <div>
+            <hr/>
+            <fieldset>
+                <legend>Миграция населения</legend>
+            <form class="form" action="/population" method="POST" enctype="multipart/form-data">
+                <input type=file name="migration_file">
+                <input type=submit value=Upload>
+                {#{ file_input('reprod_file') }#}
+            </form>
+                </fieldset>
+        </div>
+        <div>
+            <hr/>
+            <fieldset>
+                <legend>Рождаемость населения</legend>
+            <form class="form" action="/population" method="POST" enctype="multipart/form-data">
+                <input type=file name="nathality_file">
+                <input type=submit value=Upload>
+                {#{ file_input('reprod_file') }#}
+            </form>
+                </fieldset>
+        </div>
+        <div>
+            <hr/>
+            <fieldset>
+                <legend>Смертность населения</legend>
+            <form class="form" action="/population" method="POST" enctype="multipart/form-data">
+                <input type=file name="mortality_file">
+                <input type=submit value=Upload>
+                {#{ file_input('reprod_file') }#}
+            </form>
+                </fieldset>
+        </div>
+        <div>
+            <hr/>
+            <fieldset>
+                <legend>Численность населения</legend>
+                <form class="form" action="/population" method="POST" enctype="multipart/form-data">
+                <input type=file name="population_file">
+                <input type=submit value=Upload>
+                {#{ file_input('reprod_file') }#}
+            </form>
+                </fieldset>
         </div>
     </div>
-</form>
-{% endfor %}
+    {% if files  %}
+        <h2> Cписок файлов </h2>
+        <div class="table-responsive">
+            <table class="table table-condensed">
+                <thead>
+                    <tr>
+                        <th>№</th>
+                        <th>Имя файла</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for file in files %}
+                        <tr>
+                            <td>{{ file.id }}</td>
+                            <td>{{ file.filename }}</td>
+                            <td><i class="fa fa-check" aria-hidden="false"></i></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+</div>
+
+{% if populations %}
+<div class="data-container">
+    <h2>District population</h2>
+    <p>The table represents data about population in districts</p>
+    <div class="table-responsive">
+        <table class="table table-condensed">
+            <thead>
+            <tr>
+                <th></th>
+                <th>#</th>
+                <th>Year</th>
+                <th>District</th>
+                <th>Men</th>
+                <th>Women</th>
+                <th>Children</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for population in populations %}
+            <tr>
+                <form action="/population/delete" method="POST">
+                    <input type="hidden" name="population_id"
+                           value="{{population.id}}">
+                    <td>{{ submit('delete') }}</td>
+                    <td>{{population.id}}</td>
+                    <td>{{population.year}}</td>
+                    <td>{{population.district.name}}</td>
+                    <td>{{population.men}}</td>
+                    <td>{{population.women}}</td>
+                    <td>{{population.children}}</td>
+                </form>
+            </tr>
+            </tbody>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+{% endif %}
 {% endblock %}
 

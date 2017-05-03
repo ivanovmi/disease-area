@@ -1,0 +1,56 @@
+{% extends "_base.html" %}
+
+{% block js %}
+<!--
+ <script>
+
+ var map = new GMaps({
+     el: '#map',
+     lat: 51.50,
+     lng: 46.0,
+     zoom: 10
+ });
+</script>-->
+  <!-- Подключение JS для google карты -->
+    {{ gmap.js }}
+    <script type="text/javascript" charset="utf-8">
+		webix.ready(function(){
+		    tree = new webix.ui({
+		        container: "gmap-menu",
+                template: "{common.icon()} {common.checkbox()} #value#",
+                view: "tree",
+                url: "static/js/population_data.json",
+                threeState: true
+                //ready: function(){
+		        //    this.openAll();
+		        //}
+            });
+
+		});
+    </script>
+{% endblock %}
+
+{% block content %}
+
+<br>
+
+{% include "_navigation.html" %}
+
+<hr>
+        <div class="map-container" align="center">
+<!-- Отображение google карты -->
+    <table>
+    <tr>
+        <td>
+{{ gmap.html }}
+        </td>
+        <td>
+<div id="gmap-menu">
+</div>
+        </td>
+    </tr>
+    </table>
+</div>
+<!--<div id="map"></div>-->
+
+{% endblock %}

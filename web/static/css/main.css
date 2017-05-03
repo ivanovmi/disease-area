@@ -10,7 +10,32 @@ body{
 
 .map-container{
   max-width: 100% !important;
-  border: 1px solid black;
+}
+
+#gmap-menu {
+  max-height: 530px;
+  min-height: 530px;
+  min-width: 300px;
+  max-width: 300px;
+  overflow-y: auto;
+  margin-left: 8px;
+}
+
+hr {
+  margin-top: -0.003em;
+  width: 1106px;
+  display: block;
+}
+
+.input-container {
+  max-width: 80%;
+  display: block;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.container-fluid .data-container {
+  max-width: 50%;
 }
 
 .btn-circle {

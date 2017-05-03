@@ -1,7 +1,19 @@
 {% extends "_base.html" %}
 
 {% block js %}
+<!--
+ <script>
+
+ var map = new GMaps({
+     el: '#map',
+     lat: 51.50,
+     lng: 46.0,
+     zoom: 10
+ });
+</script>-->
+  <!-- Подключение JS для google карты -->
     {{ gmap.js }}
+    {{ gmap2.js }}
 {% endblock %}
 
 {% block content %}
@@ -15,6 +27,68 @@
 {% include "_navigation.html" %}
 
 <hr>
-{{ gmap.html }}
+<!-- Отображение google карты
+    <table>
+    <tr>
+        <td>
+{# { gmap.html } #}
+        </td>
+        <td>
+<div id="gmap-menu">
+    <form>
+    {#% for p in poly %#}
+        <input type="checkbox"> {#{ p['name'] }#} <br>
+        {#% endfor %#}
+    </form>
+</div>
+        </td>
+    </tr>
+    </table>-->
+
+
+<ul class="tab">
+  <li><a href="javascript:void(0)" class="tablinks" onclick="openCity(event, 'markers')">Маркеры</a></li>
+  <li><a href="javascript:void(0)" class="tablinks" onclick="openCity(event, 'poly')">Полигоны</a></li>
+</ul>
+
+<div id="markers" class="tabcontent">
+  <table>
+    <tr>
+        <td>
+    {{ gmap.html }}
+        </td>
+        <td>
+<div id="gmap-menu">
+    <form>
+    {% for m in mark %}
+        <input type="checkbox"> {{ m['name'] }} <br>
+        {% endfor %}
+    </form>
+</div>
+        </td>
+    </tr>
+    </table>
+</div>
+
+<div id="poly" class="tabcontent">
+  <table>
+    <tr>
+        <td>
+            {{ gmap2.html }}
+        </td>
+        <td>
+<div id="gmap-menu">
+    <form>
+    {% for p in poly %}
+        <input type="checkbox"> {{ p['name'] }} <br>
+        {% endfor %}
+    </form>
+</div>
+        </td>
+    </tr>
+    </table>
+</div>
+
+<!--<div id="map"></div>-->
 
 {% endblock %}

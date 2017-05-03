@@ -1,0 +1,15 @@
+{% extends '_base.html' %}
+{% block content %}
+{% from "_macro.html" import text_input with context %}
+{% from "_macro.html" import submit with context %}
+{% from "_macro.html" import select with context %}
+    <div style="width:300px; margin:0 auto;border: 1px solid black;">
+        <h1>Login</h1>
+        <form method="POST" action={{ request.path }}>
+            {{ form.hidden_tag() }}
+            <div>{{ form.username.label }} {{ form.username }}</div>
+            <div>{{ form.password.label }} {{ form.password }}</div>
+            <div>{{ form.login }}</div>
+        </form>
+    </div>
+{% endblock %}
