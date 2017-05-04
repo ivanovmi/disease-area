@@ -15,7 +15,19 @@
         <a href="{{url}}">{{runav|capitalize}}</a>
     </li>
 {% endfor %}
+
+    {% if 'username' in session %}
+        <li role="presentation" style="float: right;" class="btn">
+            <a href="{{ url_for('logout') }}">Выход</a>
+        </li>
+    {% else %}
     <li role="presentation" style="float: right;" class="btn">
         <a href="{{ url_for('login') }}">Вход</a>
     </li>
+    {% endif %}
+    {% if 'username' in session %}
+    <li role="presentation" style="float: right;" class="btn">
+    <a href="{{ url_for('population') }}">Панель администратора</a>
+    </li>
+    {% endif %}
 </ul>

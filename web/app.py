@@ -43,7 +43,7 @@ log = logging.getLogger("app")
 log.addHandler(console)
 log.setLevel(logging.DEBUG)
 
-admin_navigation = ['district', 'population', 'hospital', 'disease',
+admin_navigation = ['district', 'disease', 'population', 'hospital',
                     'disease population']
 
 navigation = ['markers_map', 'disease_map', 'population_map', 'analysis']
@@ -75,7 +75,8 @@ def admin_required(f):
     def decorated_function(*args, **kwargs):
         username = session.get('username', None)
         if username != 'admin':
-            redirect(url_for('login'))
+            abort(401)
+            #redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated_function
 
@@ -139,7 +140,8 @@ def district():
         return redirect(url_for('district'))
 
     return render_template('district.html', districts=_get_all_districts(),
-                           navigation=navigation)
+                           navigation=navigation,
+                           admin_navigation=admin_navigation)
 
 
 @app.route('/district/delete', methods=['POST'])
@@ -173,7 +175,7 @@ def disease():
             db.session.add(Disease(name=name))
             db.session.commit()
     return render_template('disease.html', diseases=_get_all_diseases(),
-                           navigation=navigation)
+                           navigation=navigation, admin_navigation=admin_navigation)
 
 
 @app.route('/disease/delete', methods=['POST'])
@@ -217,7 +219,7 @@ def hospital():
 
     return render_template('hospital.html', hospitals=_get_all_hospitals(),
                            districts=_get_all_districts(),
-                           navigation=navigation)
+                           navigation=navigation, admin_navigation=admin_navigation)
 
 
 @app.route('/hospital/delete', methods=['POST'])
@@ -273,6 +275,18 @@ def population():
                 filename = f.filename
                 f.save(os.path.join(app.config['UPLOAD_FOLDER'],
                                     secure_filename(f.filename)))
+                reprod = xls_parser.parse_reprod(
+                    os.path.join(app.config['UPLOAD_FOLDER'],
+                                 secure_filename(f.filename)),
+                    all_districts)
+
+                for i in reprod:
+                    add_new_year(year=i["year"])
+
+                    i["year_id"] = Year.query.filter_by(
+                        year=i["year"]).first().id
+                    del i["year"]
+                    db.session.add(Reprod(**i))
             elif request.files.get('marriage_file'):
                 type = 'marriage'
                 f = request.files['marriage_file']
@@ -375,7 +389,7 @@ def population():
 
     return render_template('population.html', populations=_get_all_population(),
                            districts=_get_all_districts(), files=_get_files(),
-                           navigation=navigation)
+                           navigation=navigation, admin_navigation=admin_navigation)
 
 
 @app.route('/population/delete', methods=['POST'])
@@ -428,7 +442,7 @@ def disease_population():
                            disease_populations=_get_all_disease_population(),
                            diseases=_get_all_diseases(),
                            hospitals=_get_all_hospitals(),
-                           navigation=navigation)
+                           navigation=navigation, admin_navigation=admin_navigation)
 
 
 @app.route('/disease_population/delete', methods=['POST'])
@@ -505,6 +519,7 @@ def _get_district_by_id(district_id):
     :return: dict
     """
     return District.query.filter_by(id=district_id).first() if district_id else None
+
 
 def _get_files():
     return Files.query.order_by(Files.id).all()
@@ -611,4 +626,5 @@ if __name__ == '__main__':
                 filename = path.join(dirname, filename)
                 if path.isfile(filename):
                     extra_files.append(filename)
-    app.run(host='0.0.0.0',extra_files=extra_files, debug=True, port=int(os.environ.get('PORT', 5000)))
+    app.run(host='0.0.0.0', extra_files=extra_files, debug=True,
+            port=int(os.environ.get('PORT', 5000)))

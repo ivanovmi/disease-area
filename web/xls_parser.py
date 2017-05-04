@@ -166,9 +166,36 @@ def parse_population(xls_file, districts):
         result["all"], result["men"], result["women"], result["children"], result["adults"], result["employable"], result["employable_men"], result["employable_women"] = r[1], r[2], r[3], r[4]+r[5]+r[8], r[7], r[11], r[12], r[13]
 
         results.append(result)
-    print(results)
+    return results
+
+
+def parse_reprod(xls_file, districts):
+    sheet = get_sheet(xls_file)
+    results = list()
+    for row in range(4, sheet.nrows):
+        result = dict()
+        result["year"] = sheet.row_values(0)[0]
+        r = sheet.row_values(row)
+        if r[0].startswith("Базарнокарабулакский"):
+            r[0] = "Базарно-Карабулакский район"
+        elif r[0].startswith("Энгельсский"):
+            r[0] = "Энгельский район"
+        elif r[0].startswith("Ровенский"):
+            r[0] = "Ровновский район"
+        if r[0].strip() != "г.Саратов":
+            try:
+                district_id = districts.index(r[0].strip()) + 1
+            except ValueError:
+                # TODO: weak place
+                continue
+        else:
+            district_id = 3
+        result["district_id"] = district_id
+        result["borned"], result["borned_1000"], result["died"], result["died_1000"], result["nat_add"], result["nat_add_1000"] = r[1:]
+        results.append(result)
+    return results
 
 if __name__ == "__main__":
     all_districts = list(map(str,
                              models.District.query.order_by(models.District.id).all()))
-    parse_population(sys.argv[1], all_districts)
+    parse_reprod(sys.argv[1], all_districts)

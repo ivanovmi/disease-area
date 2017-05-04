@@ -1,0 +1,20 @@
+{% set active_page = request.path %}
+<b>Добавить информацию: </b><ul class="nav nav-pills text-center">
+{% for nav in admin_navigation %}
+    {% if nav == 'district' %}
+        {% set runav = 'Районы Саратовской области' %}
+    {% elif nav == 'disease' %}
+        {% set runav = 'Заболеваемость' %}
+    {% elif nav == 'population' %}
+        {% set runav = 'Демография населения' %}
+    {% elif nav == 'hospital' %}
+        {% set runav = 'Структура здравоохранения' %}
+    {% elif nav == 'disease population' %}
+        {% set runav = 'Заболевшее население' %}
+    {% endif %}
+    {% set url = url_for(nav|replace(' ','_')) %}
+    <li role="presentation" {%- if active_page==url%} class="active" {% endif %}>
+        <a href="{{url}}">{{runav|capitalize}}</a>
+    </li>
+{% endfor %}
+</ul>
