@@ -9,12 +9,12 @@
         {% include "_admin_navigation.html" %}
         <button type="button" class="btn btn-info"
                 data-toggle="collapse"
-                data-target="#collapse-input">Expand/Collapse control
+                data-target="#collapse-input">Добавить новый элемент
         </button>
         <div id="collapse-input" class="collapse out">
             <hr/>
             <form class="form" action="/disease" method="POST">
-                {{ text_input('name','Enter a disease name', True) }}
+                {{ text_input('name','Введите название заболевания...', True) }}
                 {{ submit('add') }}
             </form>
         </div>

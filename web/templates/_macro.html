@@ -32,17 +32,24 @@
         {% endfor %}
     </select>
 {%- elif type=='disease' %}
-    <label for="disease_id">Select a disease:</label>
+    <label for="disease_id">Выберите болезнь:</label>
     <select class="form-control input" name="disease_id" id="disease_id" required>
         {% for disease in diseases %}
         <option value="{{disease.id}}">{{disease.name}}</option>
         {% endfor %}
     </select>
 {%- elif type=='hospital' %}
-    <label for="hospital_id">Select a hospital:</label>
+    <label for="hospital_id">Выберите больницу:</label>
     <select class="form-control input" name="hospital_id" id="hospital_id" required>
         {% for hospital in hospitals %}
         <option value="{{hospital.id}}">{{hospital.name}}</option>
+        {% endfor %}
+    </select>
+{%- elif type=='year' %}
+    <label for="year_id">Выберите год:</label>
+    <select class="form-control input" name="year_id" id="year_id" required>
+        {% for year in years %}
+            <option value="{{ year.id }}">{{ year.year }}</option>
         {% endfor %}
     </select>
 {%- endif %}

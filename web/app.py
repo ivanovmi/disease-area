@@ -343,7 +343,7 @@ def population():
                     i["year_id"] = Year.query.filter_by(
                         year=i["year"]).first().id
                     del i["year"]
-                    db.session.add(Mortality(**i))
+                    db.session.add(Morthality(**i))
             elif request.files.get('nathality_file'):
                 type = 'nathality'
                 f = request.files['nathality_file']
@@ -374,13 +374,10 @@ def population():
                     os.path.join(app.config['UPLOAD_FOLDER'],
                                  secure_filename(f.filename)),
                     all_districts)
-
                 for i in popul:
+                    log.debug(i)
                     add_new_year(year=i["year"])
 
-                    i["year_id"] = Year.query.filter_by(
-                        year=i["year"]).first().id
-                    del i["year"]
                     db.session.add(Population(**i))
 
             db.session.add(Files(filename=filename,
@@ -388,7 +385,7 @@ def population():
             db.session.commit()
 
     return render_template('population.html', populations=_get_all_population(),
-                           districts=_get_all_districts(), files=_get_files(),
+                           districts=_get_all_districts(), files=_get_files(), years=_get_all_years(),
                            navigation=navigation, admin_navigation=admin_navigation)
 
 
@@ -521,6 +518,9 @@ def _get_district_by_id(district_id):
     return District.query.filter_by(id=district_id).first() if district_id else None
 
 
+def _get_all_years():
+    return Year.query.order_by(Year.id).all()
+
 def _get_files():
     return Files.query.order_by(Files.id).all()
 
@@ -550,6 +550,30 @@ def _get_markers():
         h['name'] = hospital.name
         markers.append(h)
     return markers
+
+
+def _get_selected_markers():
+    markers = []
+    hospitals = _get_all_hospitals()
+    for hospital in hospitals:
+        h = dict()
+        h['icon'] = icons.dots.red
+        # Получаем долготу(lng) и широту(lat)
+        h['lng'], h['lat'] = hospital.coordinates.split('; ')
+        h['infobox'] = ("{}<br><b>Адрес:</b> {}"
+                        "<br><b>Телефон:</b> {}"
+                        "<br><b>ФИО главного врача:</b> {}"
+                        "<br><a href={} target='_blank'>Сайт учреждения</a>"
+                        "<br><b>Доп. информация:</b> {}".format(hospital.name,
+                                                                hospital.address,
+                                                                hospital.phone,
+                                                                hospital.doctor,
+                                                                hospital.site,
+                                                                hospital.info))
+        h['name'] = hospital.name
+        markers.append(h)
+    return markers
+
 
 
 def _get_polygons():

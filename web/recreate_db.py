@@ -3,6 +3,7 @@ import googlemaps
 import re
 import pprint
 import sqlite3
+import models
 
 # Cаратовская область
 # {'lat': 51.83692629999999, 'lng': 46.7539397}
@@ -170,6 +171,7 @@ def init_districts(a):
     conn.commit()
     conn.close()
 
+
 def init_types(csv_file):
     conn = sqlite3.connect('test.db')
     c = conn.cursor()
@@ -188,6 +190,7 @@ def init_types(csv_file):
     conn.commit()
     conn.close()
 
+
 def gen_js(types, dis):
     data = []
     count = 1
@@ -201,6 +204,10 @@ def gen_js(types, dis):
         for j in dis.splitlines():
             s = {}
             s['value'] = j.split('-')[0].strip()
+            if s['value'] == 'Базарно':
+                s['value'] = 'Базарно-Карабулакский район'
+            elif s['value'] == 'Александрово':
+                s['value'] = 'Александрово-Гайрайон'
             s['id'] = str(count)+'.'+str(sec_count)
             sec_count += 1
             d['data'].append(s)
@@ -208,7 +215,11 @@ def gen_js(types, dis):
 
     print(data)
 
-gen_js(types,_dis)
+gen_js(types, _dis)
+
+print([(i.type_of.split(','), i.name,
+        i.id,
+        i.district) for i in models.Hospital.query.order_by().all()])
 #import sys
 #init_districts(dis)
 #init_types('hospital_type.csv')

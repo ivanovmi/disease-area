@@ -10,16 +10,16 @@
         {% include "_admin_navigation.html" %}
         <button type="button" class="btn btn-info from-group"
                 data-toggle="collapse"
-                data-target="#collapse-input">Expand/Collapse control
+                data-target="#collapse-input">Добавить новый элемент
         </button>
         <div id="collapse-input" class="collapse out">
             <form class="form" action="/disease_population" method="POST">
                 <hr/>
-                {{ text_input('year','Enter a year', True) }}
-                {{ text_input('children','Enter amount of children') }}
-                {{ text_input('children_observed','Enter amount of observed children') }}
-                {{ text_input('adults','Enter amount of adults') }}
-                {{ text_input('adults_observed','Enter amount of observedi adults') }}
+                {{ text_input('year','Введите год...', True) }}
+                {{ text_input('children','Введите число детей...') }}
+                {{ text_input('children_observed','Введите число наблюдаемых детей...') }}
+                {{ text_input('adults','Введите число взрослых...') }}
+                {{ text_input('adults_observed','Введите число наблюдаемых взрослых...') }}
                 {{ select('disease') }}
                 {{ select('hospital') }}
                 {{ submit('add') }}

@@ -1,48 +1,6 @@
 import xlrd
-import re
 import sys
 import models
-
-districts = """
-Александрово-Гайский
-Аркадакский
-Аткарский
-Базарно-карабулакский
-Балаковский
-Балашовский
-Балтайский
-Вольский
-Воскресенский
-Дергачевский
-Духовницкий
-Екатериновский
-Ершовский
-Ивантеевский
-Калининский
-Красноармейский
-Краснокутский
-Краснопартизанский
-Лысогорский
-Марксовский
-Новобурасский
-Новоузенский
-Озинский
-Перелюбский
-Петровский
-Питерский
-Пугачевский
-Ровенский
-Романовский
-Ртищевский
-Самойловский
-Саратовский
-Советский
-Татищевский
-Турковский
-Федоровский
-Хвалынский
-Энгельсский
-"""
 
 
 def get_sheet(xls_file, sheet_number=0):
@@ -93,6 +51,30 @@ def parse_migration(xls_file, districts):
             district_id = 3
         result["district_id"] = district_id
         result["added"], result["substituded"], result["diff"] = r[1:]
+        results.append(result)
+    return results
+
+
+def parse_nathality(xls_file, districts):
+    sheet = get_sheet(xls_file)
+    results = list()
+    for row in range(4, sheet.nrows):
+        result = dict()
+        result["year"] = sheet.row_values(0)[0]
+        r = sheet.row_values(row)
+        if r[0] == "Базарнокарабулакский":
+            r[0] = "Базарно-Карабулакский"
+        elif r[0] == "Энгельсский":
+            r[0] = "Энгельский"
+        elif r[0] == "Ровенский":
+            r[0] = "Ровновский"
+        if r[0].strip() != "г.Саратов":
+            district_id = districts.index(r[0].strip() + " район") + 1
+        else:
+            district_id = 3
+        result["district_id"] = district_id
+        result["under_15"], result["_15_17"], result["_18_24"], result["_25_29"], result["_30_34"], result["_35_older"] = [i if i != "-" else 0 for i in r[2:]]
+
         results.append(result)
     return results
 

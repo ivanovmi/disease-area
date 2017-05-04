@@ -9,33 +9,35 @@
     <div class="text-center">
         {% include "_navigation.html" %}
         {% include "_admin_navigation.html" %}
-        <button type="button" class="btn btn-info form-group"
-                data-toggle="collapse"
-                data-target="#collapse-input">Expand/Collapse control
-        </button>
-        <div id="collapse-input" class="collapse out">
-            <hr/>
-            <form class="form" action="/population" method="POST">
-                {{ text_input('year','Enter a year', True) }}
-                {{ text_input('women','Enter amount of women') }}
-                {{ text_input('men','Enter amount of men') }}
-                {{ text_input('children','Enter amount of children') }}
-                {{ text_input('employable_men','Enter amount of employable men') }}
-                {{ text_input('employable_women','Enter amount of employable women') }}
-                {{ select('district') }}
-                {{ submit('add') }}
-            </form>
-        </div>
+
         <div>
             <hr/>
             <fieldset>
                 <legend>Воспроизводство населения</legend>
             <form class="form" action="/population" method="POST" enctype="multipart/form-data">
                 <input type=file name="reprod_file">
-                <input type=submit value=Upload>
+                <input type=submit value=Загрузить>
                 {#{ file_input('reprod_file') }#}
                 </form>
             </fieldset>
+            <button type="button" class="btn btn-info form-group"
+                data-toggle="collapse"
+                data-target="#collapse-input">Добавить новый элемент
+        </button>
+        <div id="collapse-input" class="collapse out">
+            <hr/>
+            <form class="form" action="/population" method="POST" name="reprod">
+                {{ text_input('borned','Введите число родившихся...') }}
+                {{ text_input('borned_1000','Введите число родившихся на тысячу населения...') }}
+                {{ text_input('died','Введите число умерших...') }}
+                {{ text_input('died_1000','Введите число умерших на тысячу населения...') }}
+                {{ text_input('nat_add','Введите размер естественного прироста...') }}
+                {{ text_input('nat_add_1000','Введите размер естественного прироста на тысячу населения...') }}
+                {{ select('district') }}
+                {{ select('year') }}
+                {{ submit('add') }}
+            </form>
+        </div>
         </div>
         <div>
             <hr/>
@@ -43,10 +45,26 @@
                 <legend>Браки</legend>
             <form class="form" action="/population" method="POST" enctype="multipart/form-data">
                 <input type=file name="marriage_file">
-                <input type=submit value=Upload>
+                <input type=submit value=Загрузить>
                 {#{ file_input('reprod_file') }#}
             </form>
                 </fieldset>
+            <button type="button" class="btn btn-info form-group"
+                data-toggle="collapse"
+                data-target="#collapse-input">Добавить новый элемент
+        </button>
+        <div id="collapse-input" class="collapse out">
+            <hr/>
+            <form class="form" action="/population/marriage" method="POST" name="marriage">
+                {{ text_input('marriage','Введите число браков...') }}
+                {{ text_input('marriage_1000','Введите число браков на тысячу населения...') }}
+                {{ text_input('divorce','Введите число разводов...') }}
+                {{ text_input('divorce_1000','Введите число разводов на тысячу населения...') }}
+                {{ select('district') }}
+                {{ select('year') }}
+                {{ submit('add') }}
+            </form>
+        </div>
         </div>
         <div>
             <hr/>
@@ -54,10 +72,25 @@
                 <legend>Миграция населения</legend>
             <form class="form" action="/population" method="POST" enctype="multipart/form-data">
                 <input type=file name="migration_file">
-                <input type=submit value=Upload>
+                <input type=submit value=Загрузить>
                 {#{ file_input('reprod_file') }#}
             </form>
                 </fieldset>
+                <button type="button" class="btn btn-info form-group"
+                data-toggle="collapse"
+                data-target="#collapse-input">Добавить новый элемент
+        </button>
+        <div id="collapse-input" class="collapse out">
+            <hr/>
+            <form class="form" action="/population" method="POST">
+                {{ text_input('added','Введите число прибывших людей...') }}
+                {{ text_input('substituted','Введите число выбывших людей...') }}
+                {{ text_input('diff','Введите величину миграционного прироста...') }}
+                {{ select('district') }}
+                {{ select('year') }}
+                {{ submit('add') }}
+            </form>
+        </div>
         </div>
         <div>
             <hr/>
@@ -65,10 +98,29 @@
                 <legend>Рождаемость населения</legend>
             <form class="form" action="/population" method="POST" enctype="multipart/form-data">
                 <input type=file name="nathality_file">
-                <input type=submit value=Upload>
+                <input type=submit value=Загрузить>
                 {#{ file_input('reprod_file') }#}
             </form>
                 </fieldset>
+            <button type="button" class="btn btn-info form-group"
+                data-toggle="collapse"
+                data-target="#collapse-input">Добавить новый элемент
+        </button>
+        <div id="collapse-input" class="collapse out">
+            <hr/>
+            <form class="form" action="/population" method="POST">
+                {{ text_input('under_15','Введите число родившихся детей среди матерей в возрасте моложе 15 лет...') }}
+                {{ text_input('_15_17','Введите число родившихся детей среди матерей в возрасте от 15 до 17 лет...') }}
+                {{ text_input('_18_24','Введите число родившихся детей среди матерей в возрасте от 18 до 24 лет...') }}
+                {{ text_input('_25_29','Введите число родившихся детей среди матерей в возрасте от 25 до 29 лет...') }}
+                {{ text_input('_30_34','Введите число родившихся детей среди матерей в возрасте от 30 до 34 лет...') }}
+                {{ text_input('_35_older','Введите число родившихся детей среди матерей в возрасте от 35 лет...') }}
+                {{ select('district') }}
+                {{ select('year') }}
+                {{ submit('add') }}
+            </form>
+        </div>
+        </div>
         </div>
         <div>
             <hr/>
@@ -76,10 +128,27 @@
                 <legend>Смертность населения</legend>
             <form class="form" action="/population" method="POST" enctype="multipart/form-data">
                 <input type=file name="mortality_file">
-                <input type=submit value=Upload>
+                <input type=submit value=Загрузить>
                 {#{ file_input('reprod_file') }#}
             </form>
                 </fieldset>
+            <button type="button" class="btn btn-info form-group"
+                data-toggle="collapse"
+                data-target="#collapse-input">Добавить новый элемент
+        </button>
+        <div id="collapse-input" class="collapse out">
+            <hr/>
+            <form class="form" action="/population" method="POST">
+                {{ text_input('all_population','Введите число умерших среди всего населения...') }}
+                {{ text_input('city_population','Введите число умерших среди городского населения...') }}
+                {{ text_input('village_population','Введите число умерших среди cельского населения...') }}
+                {{ text_input('died_on_1000_borned','Введите число умерших на 1000 населения...') }}
+                {{ text_input('died_under_1','Введите число умерших детей до одного года...') }}
+                {{ select('district') }}
+                {{ select('year') }}
+                {{ submit('add') }}
+            </form>
+        </div>
         </div>
         <div>
             <hr/>
@@ -87,10 +156,28 @@
                 <legend>Численность населения</legend>
                 <form class="form" action="/population" method="POST" enctype="multipart/form-data">
                 <input type=file name="population_file">
-                <input type=submit value=Upload>
+                <input type=submit value=Загрузить>
                 {#{ file_input('reprod_file') }#}
             </form>
                 </fieldset>
+                <button type="button" class="btn btn-info form-group"
+                data-toggle="collapse"
+                data-target="#collapse-input">Добавить новый элемент
+        </button>
+        <div id="collapse-input" class="collapse out">
+            <hr/>
+            <form class="form" action="/population" method="POST">
+                {{ text_input('year','Введите год...', True) }}
+                {{ text_input('women','Введите число женщин...') }}
+                {{ text_input('men','Введите число мужчин...') }}
+                {{ text_input('children','Введите число детей...') }}
+                {{ text_input('employable_men','Введите число работающих мужчин...') }}
+                {{ text_input('employable_women','Введите число работающих женщин...') }}
+                {{ select('district') }}
+                {{ submit('add') }}
+            </form>
+        </div>
+
         </div>
     </div>
     {% if files  %}
@@ -120,19 +207,19 @@
 
 {% if populations %}
 <div class="data-container">
-    <h2>District population</h2>
-    <p>The table represents data about population in districts</p>
+    <h2>Население районов</h2>
+    <p>Таблица отображает данные о населении в районах</p>
     <div class="table-responsive">
         <table class="table table-condensed">
             <thead>
             <tr>
                 <th></th>
                 <th>#</th>
-                <th>Year</th>
-                <th>District</th>
-                <th>Men</th>
-                <th>Women</th>
-                <th>Children</th>
+                <th>Год</th>
+                <th>Район</th>
+                <th>Мужчин</th>
+                <th>Женщин</th>
+                <th>Детей</th>
                 <th></th>
             </tr>
             </thead>
