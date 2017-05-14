@@ -12,12 +12,13 @@ body{
   max-width: 100% !important;
 }
 
+
 #gmap-menu {
-  max-height: 530px;
-  min-height: 530px;
-  min-width: 300px;
-  max-width: 300px;
-  overflow-y: auto;
+  max-height: 550px;
+  min-height: 550px;
+  min-width: 340px;
+  max-width: 340px;
+  overflow: hidden;
   margin-left: 8px;
 }
 

@@ -1,34 +1,155 @@
 {% extends "_base.html" %}
 
 {% block js %}
-<!--
+
  <script>
 
- var map = new GMaps({
-     el: '#map',
-     lat: 51.50,
-     lng: 46.0,
-     zoom: 10
- });
-</script>-->
-  <!-- Подключение JS для google карты -->
-    {{ gmap.js }}
-    	<script type="text/javascript" charset="utf-8">
-		webix.ready(function(){
-		    tree = new webix.ui({
-		        container: "gmap-menu",
-                template: "{common.icon()} {common.checkbox()} #value#",
-                view: "tree",
-                url: "static/js/data.json",
-                threeState: true
-                //ready: function(){
-		        //    this.openAll();
-		        //}
+   var map = new GMaps({
+  div: '#map',
+  height: "530px",
+  width: "870px",
+  lat: 51.35,
+  lng: 46.70,
+    zoom: 7
+});
+
+   {% for marker in mark %}
+       map.addMarker({
+           lat: {{ marker["lat"] }},
+           lng: {{ marker["lng"] }},
+           title: "{{ marker["name"] }}",
+           icon: "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|"+"{{ colors[marker["district"]] }}",
+           infoWindow: {
+               content: '{{ marker["infobox"] }}'.replace(/&lt;/g, "<").replace(/&gt;/g, ">")
+           }
+       });
+   {% endfor %}
+
+/*
+   function loadResults (data) {
+      var items, markers_data = [];
+       console.log(data);
+      if (data.markers.length > 0) {
+        items = data.markers;
+
+        for (var i = 0; i < items.length; i++) {
+          var item = items[i];
+
+          if (item.location.lat != undefined && item.location.lng != undefined) {
+
+            markers_data.push({
+              lat : item.lat,
+              lng : item.lng,
+              title : item.name,
+              icon : {
+                url : icon
+              }
             });
+          }
+        }
+      }
 
-		});
+      map.addMarkers(markers_data);
+    }
+
+   var xhr = $.getJSON('{# }{ url_for('static', filename='js/markers.json') }#}').responseJSON;
+
+   xhr.done(loadResults);
+*//*
+   setInterval(                               //Periodically
+  function()
+  {
+     $.getJSON(                            //Get some values from the server
+             {#  #}{ url_for('get_mark') }},      // At this URL
+        {},                                // With no extra parameters
+        function(data)                     // And when you get a response
+        {
+          $("#result").text(data.result);  // Write the results into the
+                                           // #result element
+        });
+  },
+  500);*/
+   /*
+       var mrks = [];
+              mrks.push({
+                  lat: {# { marker["lat"] }#},
+                  lng: {# { marker["lng"] }#},
+                  title: "{#  #}{ marker['name'] }}",
+                  infoWindow:{
+                      content: '{#  #}{ marker["infobox"] }}'.replace(/&lt;/g, "<").replace(/&gt;/g, ">")
+                  }
+              });
+
+       map.addMarkers(mrks);
+
+
+    $( document ).ready(function(e) {
+        $.ajax({
+            type: "GET",
+            url: "/markers_map",
+            dataType: "json",
+            success: function(data) {
+                console.log(data);
+                //map.removeMarkers();
+                $.each(data, function(key, value){
+                    map.addMarker({
+                        lat: value.lat,
+                        lng: value.lng,
+                        title: value.name,
+                        infoWindow: {
+                            content: '<p>' + value.address + '</p>'
+                        }
+                    })
+                })
+                }
+        });
+    });*/
+ </script>
+  <!-- Подключение JS для google карты -->
+    <script type="text/javascript" charset="utf-8">
+    function submit(){
+	    //webix.ajax.prototype.post('markers_map', JSON.stringify($$("myForm").getValues(), null, 2));
+        webix.send('markers_map', $$("myForm").getValues());
+    }
+    webix.protoUI({
+	    name:"formTree",
+        defaults:{
+            width: 320,
+            scroll: false
+	    },
+    	setValue:function(value){ this.checkItem(value); },
+    	getValue:function(){ return this.getChecked(); }
+    }, webix.ui.tree);
+    webix.ui({
+        view:"form",
+        id:"myForm",
+        container: 'gmap-menu',
+        elements: [
+        {view:"formTree", name:"types",
+            height: 430,
+            url: "{{ url_for('static', filename='js/data.json') }}",
+            template: "{common.checkbox()} #value#",
+            threeState: true
+        },
+        {view:'select',
+        name: 'district',
+        value:0, options: [
+            {% for district in dist %}
+                {% if district.name=='--' %}
+                    {id:"0", value: "{{district.name}}" }
+                {% else %}
+                    {id:"{{district.id}}", value: "{{district.name}}" }
+                {% endif %}
+                {% if not loop.last %},
+                {% endif %}
+            {% endfor %}
+        ]},
+        {view:"button", value: "Показать",
+            width: 150,
+            align:"center",
+            click:submit
+        }]});
     </script>
-
 {% endblock %}
 
 {% block content %}
@@ -36,24 +157,26 @@
 <br>
 
 {% include "_navigation.html" %}
-
+<div id="result"></div>
 <hr>
-
+    <div id="disease_map"></div>
         <div class="map-container" align="center">
 <!-- Отображение google карты -->
-    <table>
+<table>
     <tr>
         <td>
-    {{ gmap.html }}
+     <div id="map">
+     </div>
         </td>
         <td>
-<div id="gmap-menu">
-<!--<button onclick='new google.maps.Marker({title: "New Marker", position: {lat: 37.4640, lng: -122.1350}}).setMap(disease_map)'>Add new marker above</button>-->
-</div>
+            <form action="/" method="POST">
+                <div id="gmap-menu"></div>
+            </form>
         </td>
     </tr>
     </table>
 </div>
-<!--<div id="map"></div>-->
+
+
 
 {% endblock %}

@@ -14,10 +14,10 @@
 }(this, function() {
 
 /*!
- * GMaps.js v0.4.24
+ * GMaps.js v0.4.25
  * http://hpneo.github.com/gmaps/
  *
- * Copyright 2016, Gustavo Leon
+ * Copyright 2017, Gustavo Leon
  * Released under the MIT License.
  */
 
@@ -69,7 +69,7 @@ var array_map = function(array, callback) {
   }
   else {
     for (i = 0; i < array_length; i++) {
-      var callback_params = original_callback_params;
+      callback_params = original_callback_params;
       callback_params.splice(0, 0, array[i]);
       array_return.push(callback.apply(this, callback_params));
     }
@@ -147,6 +147,14 @@ var getElementById = function(id, context) {
 var findAbsolutePosition = function(obj)  {
   var curleft = 0,
       curtop = 0;
+
+  if (obj.getBoundingClientRect) {
+      var rect = obj.getBoundingClientRect();
+      var sx = -(window.scrollX ? window.scrollX : window.pageXOffset);
+      var sy = -(window.scrollY ? window.scrollY : window.pageYOffset);
+
+      return [(rect.left - sx), (rect.top - sy)];
+  }
 
   if (obj.offsetParent) {
     do {
@@ -236,7 +244,6 @@ var GMaps = (function(global) {
         };
 
       if (typeof(options.el) === 'string' || typeof(options.div) === 'string') {
-
         if (identifier.indexOf("#") > -1) {
             /**
              * Container element
@@ -245,9 +252,9 @@ var GMaps = (function(global) {
              */
             this.el = getElementById(identifier, options.context);
         } else {
-            this.el = getElementsByClassName(this, [identifier, options.context]);
+            this.el = getElementsByClassName.apply(this, [identifier, options.context]);
         }
-      } else {11
+      } else {
           this.el = identifier;
       }
 

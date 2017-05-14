@@ -81,16 +81,118 @@ def admin_required(f):
     return decorated_function
 
 
-@app.route('/markers_map', methods=['GET'])
+color = {1: '4b9c3d',
+         2: '0e29a6',
+         3: '46dcac',
+         4: 'c0a6e1',
+         5: '10e4e8',
+         6: 'ab3463',
+         7: 'f0fe09',
+         8: 'd7f195',
+         9: '406ed4',
+         10: '7037cb',
+         11: 'c8c069',
+         12: '34e73a',
+         13: 'ac3929',
+         14: 'b5cc93',
+         15: 'e4861f',
+         16: 'f13ebe',
+         17: 'a8e610',
+         18: '138c7c',
+         19: '37508c',
+         20: 'f94c15',
+         21: '00d010',
+         22: 'f2dc77',
+         23: 'f1a0d3',
+         24: '419ef4',
+         25: '503bed',
+         26: '70361b',
+         27: '0a3d6e',
+         28: 'b7110f',
+         29: 'c6f50e',
+         30: 'c165b0',
+         31: 'd03f27',
+         32: 'afc760',
+         33: 'd4a57a',
+         34: 'ecbc62',
+         35: '366737',
+         36: '65ebdb',
+         37: 'a2a3ec',
+         38: '2f61a6',
+         39: 'd1f703'
+         }
+
+
+@app.route('/markers_map', methods=['GET', 'POST'])
 def markers_map():
+    if request.method == 'POST':
+        log.debug(request.form)
+        _json = dict()
+        _json['types'] = request.form.get('types').split(',')
+        _json['district'] = request.form.get('district')
+        return redirect(url_for('markers_map')+'?{}'.format(_json))
+
     markers = _get_markers()
-    gmap = Map("disease_map",
-               lat=51.35, lng=46.70,
-               zoom=7, style=style,
-               cluster=True, cluster_gridsize=10, markers=markers)
-    #json_menu = json.dumps(generate_json(), ensure_ascii=False)
-    return render_template('markers_map.html', navigation=navigation, gmap=gmap,
-                           mark=markers)
+    _json = request.args
+
+    try:
+        _json = next(iter(_json))
+    except StopIteration:
+        _json = None
+
+    try:
+        _json = ast.literal_eval(_json)
+    except ValueError:
+        _json = None
+
+    log.debug(_json)
+    mrkrs = list()
+    if _json is not None:
+        if _json['district'] != '0':
+            markers[:] = [d for d in markers if
+                          str(d.get('district')) == _json['district']]
+        if _json['types'] != []:
+            for marker in markers:
+                remove = True
+                for _type in _json['types']:
+                    if _type in marker['types']:
+                        remove = False
+                if not remove:
+                    mrkrs.append(marker)
+        else:
+            mrkrs = markers
+
+    districts = _get_all_districts()
+    districts.append(District(name='--'))
+    return render_template('markers_map.html', navigation=navigation,
+                           mark=mrkrs, dist=districts, colors=color)
+
+
+def get_mark(markers, js):
+    mrkrs = list()
+    a = dict()
+    log.debug(js)
+    try:
+        _json = ast.literal_eval(js)
+    except ValueError:
+        _json = None
+    log.debug(_json)
+    if _json is not None:
+        if _json['district'] != '0':
+            markers[:] = [d for d in markers if
+                          str(d.get('district')) == _json['district']]
+        if _json['types'] != []:
+            for marker in markers:
+                remove = True
+                for _type in _json['types']:
+                    if _type in marker['types']:
+                        remove = False
+                if not remove:
+                    mrkrs.append(marker)
+        else:
+            mrkrs = markers
+
+    return mrkrs
 
 
 @app.route('/disease_map')
@@ -548,6 +650,8 @@ def _get_markers():
                                                                 hospital.site,
                                                                 hospital.info))
         h['name'] = hospital.name
+        h['district'] = hospital.district_id
+        h['types'] = hospital.type_of.split(',')
         markers.append(h)
     return markers
 
@@ -573,7 +677,6 @@ def _get_selected_markers():
         h['name'] = hospital.name
         markers.append(h)
     return markers
-
 
 
 def _get_polygons():
