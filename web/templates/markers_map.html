@@ -25,63 +25,7 @@
        });
    {% endfor %}
 
-/*
-   function loadResults (data) {
-      var items, markers_data = [];
-       console.log(data);
-      if (data.markers.length > 0) {
-        items = data.markers;
-
-        for (var i = 0; i < items.length; i++) {
-          var item = items[i];
-
-          if (item.location.lat != undefined && item.location.lng != undefined) {
-
-            markers_data.push({
-              lat : item.lat,
-              lng : item.lng,
-              title : item.name,
-              icon : {
-                url : icon
-              }
-            });
-          }
-        }
-      }
-
-      map.addMarkers(markers_data);
-    }
-
-   var xhr = $.getJSON('{# }{ url_for('static', filename='js/markers.json') }#}').responseJSON;
-
-   xhr.done(loadResults);
-*//*
-   setInterval(                               //Periodically
-  function()
-  {
-     $.getJSON(                            //Get some values from the server
-             {#  #}{ url_for('get_mark') }},      // At this URL
-        {},                                // With no extra parameters
-        function(data)                     // And when you get a response
-        {
-          $("#result").text(data.result);  // Write the results into the
-                                           // #result element
-        });
-  },
-  500);*/
    /*
-       var mrks = [];
-              mrks.push({
-                  lat: {# { marker["lat"] }#},
-                  lng: {# { marker["lng"] }#},
-                  title: "{#  #}{ marker['name'] }}",
-                  infoWindow:{
-                      content: '{#  #}{ marker["infobox"] }}'.replace(/&lt;/g, "<").replace(/&gt;/g, ">")
-                  }
-              });
-
-       map.addMarkers(mrks);
-
 
     $( document ).ready(function(e) {
         $.ajax({

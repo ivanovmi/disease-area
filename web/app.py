@@ -151,7 +151,7 @@ def markers_map():
         if _json['district'] != '0':
             markers[:] = [d for d in markers if
                           str(d.get('district')) == _json['district']]
-        if _json['types'] != []:
+        if _json['types'] != ['']:
             for marker in markers:
                 remove = True
                 for _type in _json['types']:
