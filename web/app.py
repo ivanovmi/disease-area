@@ -46,7 +46,7 @@ log.setLevel(logging.DEBUG)
 admin_navigation = ['district', 'disease', 'population', 'hospital',
                     'disease population']
 
-navigation = ['markers_map', 'disease_map', 'population_map', 'analysis']
+navigation = ['markers_map', 'disease_map', 'population_map']
 
 style = "height:530px;width:870px;margin:0;"
 
@@ -166,33 +166,6 @@ def markers_map():
     districts.append(District(name='--'))
     return render_template('markers_map.html', navigation=navigation,
                            mark=mrkrs, dist=districts, colors=color)
-
-
-def get_mark(markers, js):
-    mrkrs = list()
-    a = dict()
-    log.debug(js)
-    try:
-        _json = ast.literal_eval(js)
-    except ValueError:
-        _json = None
-    log.debug(_json)
-    if _json is not None:
-        if _json['district'] != '0':
-            markers[:] = [d for d in markers if
-                          str(d.get('district')) == _json['district']]
-        if _json['types'] != []:
-            for marker in markers:
-                remove = True
-                for _type in _json['types']:
-                    if _type in marker['types']:
-                        remove = False
-                if not remove:
-                    mrkrs.append(marker)
-        else:
-            mrkrs = markers
-
-    return mrkrs
 
 
 @app.route('/disease_map')

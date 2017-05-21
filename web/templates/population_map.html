@@ -1,32 +1,117 @@
 {% extends "_base.html" %}
 
 {% block js %}
-<!--
- <script>
+<script>
 
- var map = new GMaps({
-     el: '#map',
-     lat: 51.50,
-     lng: 46.0,
-     zoom: 10
- });
-</script>-->
-  <!-- Подключение JS для google карты -->
-    {{ gmap.js }}
+   var map = new GMaps({
+  div: '#map',
+  height: "530px",
+  width: "870px",
+  lat: 51.35,
+  lng: 46.70,
+    zoom: 7
+});
+</script>
     <script type="text/javascript" charset="utf-8">
-		webix.ready(function(){
-		    tree = new webix.ui({
-		        container: "gmap-menu",
-                template: "{common.icon()} {common.checkbox()} #value#",
-                view: "tree",
-                url: "static/js/population_data.json",
-                threeState: true
-                //ready: function(){
-		        //    this.openAll();
-		        //}
-            });
+    function submit(){
+	    //webix.ajax.prototype.post('markers_map', JSON.stringify($$("myForm").getValues(), null, 2));
+        webix.send('markers_map', $$("myForm").getValues());
+    }
+    /*webix.protoUI({
+	    name:"tabview",
+        defaults:{
+            width: 320,
+            scroll: false
+	    },
+    	setValue:function(value){ this.checkItem(value); },
+    	getValue:function(){ return this.getChecked(); }
+    }, webix.ui.tree);*/
+    var _tabs = JSON.parse('[{"id": "1", "value": "Численность населения"}, {"id": "2", "value": "Рождаемость"}, {"id": "3", "value": "Смертность"}, {"id": "4", "value": "Воспроизводство населения"}, {"id": "5", "value": "Браки"}, {"id": "6", "value": "Миграция"}]');
+    var tabs = [];
+    for (i = 0; i < _tabs.length; ++i) {
+        tabs.push({header: _tabs[i]["value"]})
+    }
+    /*webix.ui({
+        view:"form",
+        id:"myForm",
+        container: 'gmap-menu',
+        elements: [
+        {
+            view:"tabview",
+            tabbar: {
+                optionWidth: 1000
+            },
+            name:"types",
+            height: 430,
+            cells: tabs
+        },
+        {view:"button", value: "Показать",
+            width: 150,
+            align:"center",
+            click:submit
+        }]});*/
+     webix.ui({
+        container: "gmap-menu",
+        padding:8,
+        id:"views",
+        cells:[
+            {
+                id:"listView",
+                view:"list",
+                template:"#header#",
+                type:{
+                    height:60
+                },
+                select:true,
+                data:tabs
+            },
+            {
+                id:"formView",
+                view:"form",
+                scroll:false,
+                elements:[
+                    { view:"text", label:"Rank",  name:"rank", labelWidth: 70},
+                    { view:"text", label: "Title", name:"title" ,  placeholder:"Book title", labelWidth: 70},
+                    { view:"text", label: "Year",  name:"year",  placeholder:"Year", labelWidth: 70},
+                    { margin:5, cols:[
+                        { view:"button", value:"Cancel" , click:"cancel()" },
+                        { view:"button", value:"Save", type:"form", click:"save()" }
+                    ]},
+	                {}
+                ]
+            }
+        ]
 
-		});
+
+    });
+
+    /*
+     binds Form with List:
+     - selected item loaded in Form,
+     - updating data after form saving
+    */
+    $$('formView').bind($$('listView'));
+
+    /*
+        opening form on item selection
+    */
+    $$("listView").attachEvent("onItemClick",function(id){
+        $$('formView').show();
+    });
+
+    /*
+        data saving and opening previous view
+     */
+    function save(){
+        $$("formView").save();
+        $$("views").back();
+    }
+    /*
+        cancel editing
+    */
+    function cancel(){
+        $$("views").back();
+    }
     </script>
 {% endblock %}
 
@@ -42,7 +127,7 @@
     <table>
     <tr>
         <td>
-{{ gmap.html }}
+            <div id="map"></div>
         </td>
         <td>
 <div id="gmap-menu">
