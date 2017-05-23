@@ -11,11 +11,23 @@
   lng: 46.70,
     zoom: 7
 });
+   {% for p in poly %}
+        polygon = map.drawPolygon({
+            paths: {{ p['path'] }}, // pre-defined polygon shape
+            strokeColor: '{{ p['stroke_color'] }}',
+            strokeOpacity: {{ p['stroke_opacity'] }},
+            strokeWeight: {{ p['stroke_weight'] }},
+            fillColor: '#{{ p['fill_color'] }}',
+            fillOpacity: 0.5
+        });
+
+   {% endfor %}
+
 </script>
     <script type="text/javascript" charset="utf-8">
-    function submit(){
+    function submit(form){
 	    //webix.ajax.prototype.post('markers_map', JSON.stringify($$("myForm").getValues(), null, 2));
-        webix.send('markers_map', $$("myForm").getValues());
+        webix.send('population_map', $$(form).getValues());
     }
     /*webix.protoUI({
 	    name:"tabview",
@@ -26,30 +38,11 @@
     	setValue:function(value){ this.checkItem(value); },
     	getValue:function(){ return this.getChecked(); }
     }, webix.ui.tree);*/
-    var _tabs = JSON.parse('[{"id": "1", "value": "Численность населения"}, {"id": "2", "value": "Рождаемость"}, {"id": "3", "value": "Смертность"}, {"id": "4", "value": "Воспроизводство населения"}, {"id": "5", "value": "Браки"}, {"id": "6", "value": "Миграция"}]');
+    var _tabs = JSON.parse('[{"id": "1", "value": "Численность"}, {"id": "2", "value": "Рождаемость"}, {"id": "3", "value": "Смертность"}, {"id": "4", "value": "Воспроизводство"}, {"id": "5", "value": "Браки"}, {"id": "6", "value": "Миграция"}]');
     var tabs = [];
     for (i = 0; i < _tabs.length; ++i) {
         tabs.push({header: _tabs[i]["value"]})
     }
-    /*webix.ui({
-        view:"form",
-        id:"myForm",
-        container: 'gmap-menu',
-        elements: [
-        {
-            view:"tabview",
-            tabbar: {
-                optionWidth: 1000
-            },
-            name:"types",
-            height: 430,
-            cells: tabs
-        },
-        {view:"button", value: "Показать",
-            width: 150,
-            align:"center",
-            click:submit
-        }]});*/
      webix.ui({
         container: "gmap-menu",
         padding:8,
@@ -66,16 +59,155 @@
                 data:tabs
             },
             {
-                id:"formView",
+                id:"formViewЧисленность",
                 view:"form",
                 scroll:false,
                 elements:[
                     { view:"text", label:"Rank",  name:"rank", labelWidth: 70},
                     { view:"text", label: "Title", name:"title" ,  placeholder:"Book title", labelWidth: 70},
-                    { view:"text", label: "Year",  name:"year",  placeholder:"Year", labelWidth: 70},
+                    { view:"select", label: "Год",  name:"year",  placeholder:"Год", options: [
+                            {% for year in years['Population'] %}
+                                {
+                                    "id": {{ year.id}},
+                                    "value": {{ year.year }}
+                                }{% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                        ], labelWidth: 70},
                     { margin:5, cols:[
-                        { view:"button", value:"Cancel" , click:"cancel()" },
-                        { view:"button", value:"Save", type:"form", click:"save()" }
+                        { view:"button", value:"Назад" , click:"cancel()" },
+                        { view:"button", value:"Показать", type:"form", click:"save()" }
+                    ]},
+	                {}
+                ]
+            },
+            {
+                id:"formViewРождаемость",
+                view:"form",
+                scroll:false,
+                elements:[
+                    { view:"text", label:"Rank",  name:"rank", labelWidth: 70},
+                    { view:"text", label: "Title", name:"title" ,  placeholder:"Book title", labelWidth: 70},
+                    { view:"select", label: "Год",  name:"year",  placeholder:"Год", options: [
+                            {% for year in years['Nathality'] %}
+                                {
+                                    "id": {{ year.id}},
+                                    "value": {{ year.year }}
+                                }{% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                        ], labelWidth: 70},
+                    { margin:5, cols:[
+                        { view:"button", value:"Назад" , click:"cancel()" },
+                        { view:"button", value:"Показать", type:"form", click:"save()" }
+                    ]},
+	                {}
+                ]
+            },
+                {
+                id:"formViewСмертность",
+                view:"form",
+                scroll:false,
+                elements:[
+                    { view:"text", label:"Rank",  name:"rank", labelWidth: 70},
+                    { view:"text", label: "Title", name:"title" ,  placeholder:"Book title", labelWidth: 70},
+                    { view:"select", label: "Год",  name:"year",  placeholder:"Год", options: [
+                            {% for year in years['Morthality'] %}
+                                {
+                                    "id": {{ year.id}},
+                                    "value": {{ year.year }}
+                                }{% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                        ], labelWidth: 70},
+                    { margin:5, cols:[
+                        { view:"button", value:"Назад" , click:"cancel()" },
+                        { view:"button", value:"Показать", type:"form", click:"save()" }
+                    ]},
+	                {}
+                ]
+            },
+                {
+                id:"formViewВоспроизводство",
+                view:"form",
+                scroll:false,
+                elements:[
+                    { view:"text", label:"Rank",  name:"rank", labelWidth: 70},
+                    { view:"text", label: "Title", name:"title" ,  placeholder:"Book title", labelWidth: 70},
+                    { view:"select", label: "Год",  name:"year",  placeholder:"Год", options: [
+                            {% for year in years['Reprod'] %}
+                                {
+                                    "id": {{ year.id}},
+                                    "value": {{ year.year }}
+                                }{% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                        ], labelWidth: 70},
+                    { margin:5, cols:[
+                        { view:"button", value:"Назад" , click:"cancel()" },
+                        { view:"button", value:"Показать", type:"form", click:"save()" }
+                    ]},
+	                {}
+                ]
+            },
+                {
+                id:"formViewБраки",
+                view:"form",
+                scroll:false,
+                elements:[
+                    {
+                        view:"radio",
+                        vertical: true,
+                        name:"marriage",
+                        options: [
+                            {"id": 1, "value": "Браки"},
+                            {"id": 2, "value": "Разводы"}
+                        ]
+                    },
+                    {
+                        view:"select",
+                        label: "Год",
+                        name:"year",
+                        placeholder:"Год",
+                        options: [
+                            {% for year in years['Marriage'] %}
+                                {
+                                    "id": {{ year.id}},
+                                    "value": {{ year.year }}
+                                }{% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                        ],
+                        labelWidth: 70},
+                    { margin:5, cols:[
+                        { view:"button", value:"Назад" , click:"cancel()" },
+                        { view:"button", value:"Показать", type:"form", click:"submit('formView'.concat('Браки'))" }
+                    ]},
+	                {}
+                ],
+                rules: {
+                    marriage: webix.rules.isChecked()
+                }
+            },
+                {
+                id:"formViewМиграция",
+                view:"form",
+                scroll:false,
+                elements:[
+                    { view:"text", label:"Rank",  name:"rank", labelWidth: 70},
+                    { view:"text", label: "Title", name:"title" ,  placeholder:"Book title", labelWidth: 70},
+                    {
+                        view:"select",
+                        label: "Год",
+                        name:"year",
+                        placeholder:"Год",
+                        options: [
+                            {% for year in years['Migration'] %}
+                                {
+                                    "id": {{ year.id}},
+                                    "value": {{ year.year }}
+                                }{% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                        ],
+                        labelWidth: 70},
+                    { margin:5, cols:[
+                        { view:"button", value:"Назад" , click:"cancel()" },
+                        { view:"button", value:"Показать", type:"form", click:"save()" }
                     ]},
 	                {}
                 ]
@@ -90,21 +222,28 @@
      - selected item loaded in Form,
      - updating data after form saving
     */
-    $$('formView').bind($$('listView'));
+    $$("formViewЧисленность").bind($$('listView'));
+    $$("formViewРождаемость").bind($$('listView'));
+    $$("formViewСмертность").bind($$('listView'));
+    $$("formViewВоспроизводство").bind($$('listView'));
+    $$("formViewБраки").bind($$('listView'));
+    $$("formViewМиграция").bind($$('listView'));
 
     /*
         opening form on item selection
     */
     $$("listView").attachEvent("onItemClick",function(id){
-        $$('formView').show();
+        var form_name = 'formView'.concat($$("listView").getItem(id).header);
+        console.log(form_name);
+        $$(form_name).show();
     });
 
     /*
         data saving and opening previous view
      */
     function save(){
-        $$("formView").save();
-        $$("views").back();
+        var form_name = 'formView'.concat($$("listView").getItem(id).header);
+        submit(form_name)
     }
     /*
         cancel editing
@@ -136,6 +275,56 @@
     </tr>
     </table>
 </div>
+    <canvas id="myChart" width="1210" height="300" {% if dataset == {} %}style="display:none;"{% endif %}></canvas>
+<script>
+var ctx = document.getElementById("myChart");
+var l = [];
+{% for label in dataset['labels'] %}
+    l.push('{{ label.year }}');
+{% endfor %}
+
+var data = {
+
+    labels: l,
+    datasets: [
+        {
+            label: '{{ dataset['label'] }}',
+            fill: false,
+            lineTension: 0,
+            backgroundColor: "rgba(75,192,192,0.4)",
+            borderColor: "rgba(75,192,192,1)",
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: "rgba(75,192,192,1)",
+            pointBackgroundColor: "#fff",
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: "rgba(75,192,192,1)",
+            pointHoverBorderColor: "rgba(220,220,220,1)",
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: [65, 59, 80, 81, 56, 55, 40],
+            spanGaps: false
+        }
+    ]
+};
+var myLineChart = new Chart(ctx, {
+    type: 'line',
+    data: data,
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero:true
+                }
+            }]
+        }
+    }
+});
+</script>
 <!--<div id="map"></div>-->
 
 {% endblock %}

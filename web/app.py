@@ -179,15 +179,93 @@ def disease_map():
                            gmap=gmap, poly=polygons)
 
 
-@app.route('/population_map')
+@app.route('/population_map', methods=["GET", "POST"])
 def population_map():
-    polygons = _get_polygons()
-    gmap = Map("disease_map",
-               lat=51.35, lng=46.70,
-               zoom=7, style=style,
-               cluster=True, cluster_gridsize=10, polygons=polygons)
+    if request.method == "POST":
+        log.debug(request.form)
+        _json = dict()
+        _json['year_id'] = request.form.get('year')
+        if request.form.get('header') == 'Браки':
+            key = 'Marriage'
+        elif request.form.get('header') == "Численность":
+            key = 'Population'
+        elif request.form.get('header') == "Рождаемость":
+            key = 'Nathality'
+        elif request.form.get('header') == "Смертность":
+            key = 'Morthality'
+        elif request.form.get('header') == "Воспроизводство":
+            key = 'Reprod'
+        elif request.form.get('header') == "Миграция":
+            key = 'Migration'
+        _json['column'] = request.form.get(key.lower())
+        _json['key'] = key
+        return redirect(url_for('population_map')+'?{}'.format(_json))
+
+    _json = request.args
+    criteria = dict()
+    dataset = dict()
+    years = {
+        'Population': list(map(str, list(set([x.year_id for x in
+                                              Population.query.order_by(
+                                                  Population.year).all()])))),
+        'Nathality': [_get_year_by_id(x) for x in list(set([x.year_id for x in
+                                                            Nathality.query.order_by(
+                                                                Nathality.year_id).all()]))],
+        'Morthality': [_get_year_by_id(x) for x in list(set([x.year_id for x in
+                                                             Morthality.query.order_by(
+                                                                 Morthality.year_id).all()]))],
+        'Reprod': [_get_year_by_id(x) for x in list(set(
+            [x.year_id for x in Reprod.query.order_by(Reprod.year_id).all()]))],
+        'Marriage': [_get_year_by_id(x) for x in list(set([x.year_id for x in
+                                                           Marriage.query.order_by(
+                                                               Marriage.year_id).all()]))],
+        'Migration': [_get_year_by_id(x) for x in list(set([x.year_id for x in
+                                                            Migration.query.order_by(
+                                                                Migration.year_id).all()]))]
+    }
+
+    try:
+        _json = next(iter(_json))
+    except StopIteration:
+        _json = None
+
+    try:
+        _json = ast.literal_eval(_json)
+    except ValueError:
+        _json = None
+
+    log.debug(_json)
+    mapping = {
+        'Population': {},
+        'Nathality': {},
+        'Morthality': {},
+        'Reprod': {},
+        'Marriage': {
+            '1': 'marriage',
+            '2': 'divorce'
+        },
+        'Migration': {}
+    }
+
+    if _json is not None:
+        query = '{}.query.order_by(Marriage.id).all()'.format(_json['key'])
+        res = eval(query)
+        for i in res:
+            criteria[i.district_id] = eval('i.{}'.format(mapping[_json['key']][_json['column']]))
+
+        dataset['label'] = mapping[_json['key']][_json['column']]
+        dataset['labels'] = years[_json['key']]
+
+
+    log.debug(dataset)
+
+    if criteria != {}:
+        polygons = _get_polygons(criteria)
+    else:
+        polygons = {}
+
     return render_template('population_map.html', navigation=navigation,
-                           gmap=gmap, poly=polygons)
+                           years=years, poly=polygons, dataset=dataset)
 
 
 @app.route('/analysis')
@@ -593,8 +671,17 @@ def _get_district_by_id(district_id):
     return District.query.filter_by(id=district_id).first() if district_id else None
 
 
+def _get_year_by_id(year_id):
+    """
+    Для получения всех районов по идентификатору
+    :return: dict
+    """
+    return Year.query.filter_by(id=year_id).first() if year_id else None
+
+
 def _get_all_years():
     return Year.query.order_by(Year.id).all()
+
 
 def _get_files():
     return Files.query.order_by(Files.id).all()
@@ -652,23 +739,69 @@ def _get_selected_markers():
     return markers
 
 
-def _get_polygons():
+heat_map = """FF0000
+FF0050
+FF1100
+FF1150
+FF2200
+FF2250
+FF3300
+FF3350
+FF4400
+FF4450
+FF5500
+FF5550
+FF6600
+FF6650
+FF7700
+FF7750
+FF8800
+FF9900
+FFAA00
+FFBB00
+FFCC00
+FFDD00
+FFEE00
+FFFF00
+EEFF00
+DDFF00
+CCFF00
+BBFF00
+AAFF00
+99FF00
+88FF00
+77FF00
+66FF00
+55FF00
+44FF00
+33FF00
+22FF00
+11FF00
+00FF00"""
+
+
+def _get_polygons(criteria):
     polygons = []
     districts = _get_all_districts()
-    colors = "#ABC321"
+    map_colors = dict()
+    h = heat_map.split('\n')
+    _s = sorted(criteria, key=criteria.get)
+    for i in range(len(_s)):
+        map_colors[_s[i]] = h[i]
+
     for district in districts:
         pol = {
             'stroke_color': '#0AB0DE',
             'stroke_opacity': 1.0,
             'stroke_weight': 3,
-            'fill_color': colors,
+            'fill_color': map_colors[district.id],
             'fill_opacity': .5,
             'path': [],
             'name': district.name
         }
         coord = ast.literal_eval(district.coordinates)
         for c in coord:
-            pol['path'].append({'lng': c[0], 'lat': c[1]})
+            pol['path'].append([c[1], c[0]])
 
         polygons.append(pol)
 

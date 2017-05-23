@@ -2,32 +2,87 @@
 
 {% block js %}
 
-<!--
- <script>
+<script>
 
- var map = new GMaps({
-     el: '#map',
-     lat: 51.50,
-     lng: 46.0,
-     zoom: 10
- });
-</script>-->
+   var map = new GMaps({
+  div: '#map',
+  height: "530px",
+  width: "870px",
+  lat: 51.35,
+  lng: 46.70,
+    zoom: 7
+});
+</script>
   <!-- Подключение JS для google карты -->
-    {{ gmap.js }}
-    <script type="text/javascript" charset="utf-8">
-		webix.ready(function(){
-		    tree = new webix.ui({
-		        container: "gmap-menu",
-                template: "{common.icon()} {common.checkbox()} #value#",
-                view: "tree",
-                url: "static/js/disease_data.json",
-                threeState: true
-                //ready: function(){
-		        //    this.openAll();
-		        //}
-            });
 
-		});
+    <script type="text/javascript" charset="utf-8">
+    function submit(){
+	    //webix.ajax.prototype.post('markers_map', JSON.stringify($$("myForm").getValues(), null, 2));
+        webix.send('population_map', $$("myForm").getValues());
+    }
+     webix.ui({
+         view: "tabview",
+        container: "gmap-menu",
+        padding:8,
+        id:"views",
+        cells:[{
+            header: "Первичная",
+            body: {
+                rows: [{
+                    view:"radio",
+                    vertical: true,
+                    options:[
+                        {"id": 1, value: "ИHФEKЦИOHHЫЕ И ПAPAЗИTAPHЫЕ БOЛEЗHИ"},
+                        {"id": 2, value: "HOBOOБPAЗOBAHИЯ"},
+                        {"id": 3, value: "БOЛEЗHИ КРОВИ, КРОВЕТВОРНЫХ ОРГАHОВ И ОТД.HАРУШЕHИЯ, ВОВЛЕКАЮЩИЕ ИММУHHЫЙ МЕХАНИЗМ"},
+                        {"id": 4, value: "БOЛEЗHИ ЭHДОКРИHHОЙ СИСТЕМЫ, РАССТРОЙСТВА ПИТАHИЯ И HАРУШЕHИЯ ОБМЕHА ВЕЩЕСТВ"},
+                        {"id": 5, value: "ПCИXИЧECKИЕ PACCTPOЙCTBA И РАССТРОЙСТВА ПОВЕДЕHИЯ"},
+                        {"id": 6, value: "БOЛEЗHИ HEPBHOЙ CИCTEMЫ"},
+                        {"id": 7, value: "БOЛEЗHИ ГЛАЗА И ЕГО ПРИДАТОЧHОГО АППАРАТА"},
+                        {"id": 8, value: "БOЛEЗHИ УХА И СОСЦЕВИДHОГО ОТРОСТКА"},
+                        {"id": 9, value: "БOЛEЗHИ СИСТЕМЫ КРОВООБРАЩЕHИЯ"},
+                        {"id": 10, value: "БOЛEЗHИ ОРГАHОВ ДЫХАHИЯ"},
+                        {"id": 11, value: "БОЛЕЗHИ ОРГАHОВ ПИЩЕВАРЕHИЯ"},
+                        {"id": 12, value: "БОЛЕЗНИ КОЖИ И ПОДКОЖНОЙ КЛЕТЧАТКИ"},
+                        {"id": 13, value: "БOЛEЗHИ KOCTHO-MЫШEЧHOЙ CИCTEMЫ И COEДИHИTEЛЬHOЙ TKAHИ"},
+                        {"id": 14, value: "БОЛЕЗHИ МОЧЕПОЛОВОЙ СИСТЕМЫ"},
+                        {"id": 15, value: "БЕРЕМЕHHОСТЬ,РОДЫ И ПОСЛЕРОДОВОЙ ПEPИOД"},
+                        {"id": 16, value: "ВРОЖДЕHНЫЕ АHОМАЛИИ (ПОРОКИ РАЗВИТИЯ), ДЕФОРМАЦИИ И ХРОМОСОМHЫЕ HАРУШЕНИЯ"},
+                        {"id": 17, value: "СИМПТОМЫ, ПРИЗHАКИ И ОТКЛОHЕНИЯ ОТ HОРМЫ, ВЫЯВЛЕННЫЕ ПРИ КЛИHИЧЕСКИХ И ЛАБОРАТОРНЫХ ИССЛЕДОВАНИЯХ"},
+                        {"id": 18, value: "ТРАВМЫ, ОТРАВЛЕНИЯ И НЕКОТОРЫЕ ДРУГИЕ ПОСЛЕДСТВИЯ ВОЗДЕЙСТВИЯ ВНЕШНИХ ПРИЧИН"}
+                     ]}]
+            }
+        },
+        {
+            header: "Общая",
+            body: {
+                rows: [{
+                    view:"radio",
+                    vertical: true,
+                    options:[
+                        {"id": 1, value: "ИHФEKЦИOHHЫЕ И ПAPAЗИTAPHЫЕ БOЛEЗHИ"},
+                        {"id": 2, value: "HOBOOБPAЗOBAHИЯ"},
+                        {"id": 3, value: "БOЛEЗHИ КРОВИ, КРОВЕТВОРНЫХ ОРГАHОВ И ОТД.HАРУШЕHИЯ, ВОВЛЕКАЮЩИЕ ИММУHHЫЙ МЕХАНИЗМ"},
+                        {"id": 4, value: "БOЛEЗHИ ЭHДОКРИHHОЙ СИСТЕМЫ, РАССТРОЙСТВА ПИТАHИЯ И HАРУШЕHИЯ ОБМЕHА ВЕЩЕСТВ"},
+                        {"id": 5, value: "ПCИXИЧECKИЕ PACCTPOЙCTBA И РАССТРОЙСТВА ПОВЕДЕHИЯ"},
+                        {"id": 6, value: "БOЛEЗHИ HEPBHOЙ CИCTEMЫ"},
+                        {"id": 7, value: "БOЛEЗHИ ГЛАЗА И ЕГО ПРИДАТОЧHОГО АППАРАТА"},
+                        {"id": 8, value: "БOЛEЗHИ УХА И СОСЦЕВИДHОГО ОТРОСТКА"},
+                        {"id": 9, value: "БOЛEЗHИ СИСТЕМЫ КРОВООБРАЩЕHИЯ"},
+                        {"id": 10, value: "БOЛEЗHИ ОРГАHОВ ДЫХАHИЯ"},
+                        {"id": 11, value: "БОЛЕЗHИ ОРГАHОВ ПИЩЕВАРЕHИЯ"},
+                        {"id": 12, value: "БОЛЕЗНИ КОЖИ И ПОДКОЖНОЙ КЛЕТЧАТКИ"},
+                        {"id": 13, value: "БOЛEЗHИ KOCTHO-MЫШEЧHOЙ CИCTEMЫ И COEДИHИTEЛЬHOЙ TKAHИ"},
+                        {"id": 14, value: "БОЛЕЗHИ МОЧЕПОЛОВОЙ СИСТЕМЫ"},
+                        {"id": 15, value: "БЕРЕМЕHHОСТЬ,РОДЫ И ПОСЛЕРОДОВОЙ ПEPИOД"},
+                        {"id": 16, value: "ВРОЖДЕHНЫЕ АHОМАЛИИ (ПОРОКИ РАЗВИТИЯ), ДЕФОРМАЦИИ И ХРОМОСОМHЫЕ HАРУШЕНИЯ"},
+                        {"id": 17, value: "СИМПТОМЫ, ПРИЗHАКИ И ОТКЛОHЕНИЯ ОТ HОРМЫ, ВЫЯВЛЕННЫЕ ПРИ КЛИHИЧЕСКИХ И ЛАБОРАТОРНЫХ ИССЛЕДОВАНИЯХ"},
+                        {"id": 18, value: "ТРАВМЫ, ОТРАВЛЕНИЯ И НЕКОТОРЫЕ ДРУГИЕ ПОСЛЕДСТВИЯ ВОЗДЕЙСТВИЯ ВНЕШНИХ ПРИЧИН"}
+                     ]}]
+            }
+        }]
+     });
+
     </script>
 {% endblock %}
 
@@ -43,11 +98,11 @@
     <table>
     <tr>
         <td>
-{{ gmap.html }}
+        <div id="map"></div>
         </td>
         <td>
-<div id="gmap-menu">
-</div>
+        <div id="gmap-menu">
+        </div>
         </td>
     </tr>
     </table>

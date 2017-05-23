@@ -97,33 +97,14 @@ class Population(db.Model):
     men = db.Column(db.Integer)
     women = db.Column(db.Integer)
     children = db.Column(db.Integer)
+    teenagers = db.Column(db.Integer)
     adults = db.Column(db.Integer)
     employable = db.Column(db.Integer)
-    employable_men = db.Column(db.Integer)
-    employable_women = db.Column(db.Integer)
-
+    country_population = db.Column(db.Integer)
     district_id = db.Column(db.Integer, db.ForeignKey('district.id'))
     district = db.relationship('District',
                                backref=db.backref('population', lazy='dynamic',
                                                   uselist=True))
-
-    def __init__(self, year, district,
-                 men=0, women=0, children=0, employable_men=0,
-                 employable_women=0, district_id=0):
-        self.district = district
-        self.year = int(year)
-        self.men = int(men)
-        self.women = int(women)
-        self.children = int(children)
-        self.employable_men = int(employable_men)
-        self.employable_women = int(employable_women)
-
-        self.all = self.men + self.women
-        self.adults = self.all - self.children
-        self.employable = self.employable_men + self.employable_women
-
-    def __repr__(self):
-        return '{}:{}'.format(self.year, self.all)
 
 
 class Year(db.Model):
@@ -146,18 +127,14 @@ class Reprod(db.Model):
     year_id = db.Column(db.Integer)
     district_id = db.Column(db.Integer, db.ForeignKey("district.id"))
     borned = db.Column(db.Integer)
-    borned_1000 = db.Column(db.Integer)
     died = db.Column(db.Integer)
-    died_1000 = db.Column(db.Integer)
     nat_add = db.Column(db.Integer)
-    nat_add_1000 = db.Column(db.Integer)
 
 
 class Nathality(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     year_id = db.Column(db.Integer)
     district_id = db.Column(db.Integer, db.ForeignKey("district.id"))
-    under_15 = db.Column(db.Integer)
     _15_17 = db.Column(db.Integer)
     _18_24 = db.Column(db.Integer)
     _25_29 = db.Column(db.Integer)
@@ -170,7 +147,6 @@ class Morthality(db.Model):
     year_id = db.Column(db.Integer)
     district_id = db.Column(db.Integer, db.ForeignKey("district.id"))
     died_under_1 = db.Column(db.Integer)
-    died_on_1000_borned = db.Column(db.Integer)
     all_population = db.Column(db.Integer)
     city_population = db.Column(db.Integer)
     village_population = db.Column(db.Integer)
@@ -199,9 +175,7 @@ class Marriage(db.Model):
     year_id = db.Column(db.Integer)
     district_id = db.Column(db.Integer, db.ForeignKey("district.id"))
     marriage = db.Column(db.Integer)
-    marriage_1000 = db.Column(db.Integer)
     divorce = db.Column(db.Integer)
-    divorce_1000 = db.Column(db.Integer)
 
 
 class Personal(db.Model):

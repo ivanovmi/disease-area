@@ -27,7 +27,7 @@ def parse_marriage(xls_file, districts):
         else:
             district_id = 3
         result["district_id"] = district_id
-        result["marriage"], result["marriage_1000"], result["divorce"], result["divorce_1000"] = r[1:]
+        result["marriage"], result["divorce"] = r[1:]
         results.append(result)
     return results
 
@@ -73,7 +73,7 @@ def parse_nathality(xls_file, districts):
         else:
             district_id = 3
         result["district_id"] = district_id
-        result["under_15"], result["_15_17"], result["_18_24"], result["_25_29"], result["_30_34"], result["_35_older"] = [i if i != "-" else 0 for i in r[2:]]
+        result["_15_17"], result["_18_24"], result["_25_29"], result["_30_34"], result["_35_older"] = [i if i != "-" else 0 for i in r[2:]]
 
         results.append(result)
     return results
@@ -97,7 +97,7 @@ def parse_mortality(xls_file, districts):
         else:
             district_id = 3
         result["district_id"] = district_id
-        result["all_population"], result["city_population"], result["village_population"], result["died_on_1000_borned"], result["died_under_1"] = [i if i != "-" else 0 for i in r[1:] ]
+        result["all_population"], result["city_population"], result["village_population"], result["died_under_1"] = [i if i != "-" else 0 for i in r[1:] ]
 
         results.append(result)
     return results
@@ -145,7 +145,7 @@ def parse_population(xls_file, districts):
             district_id = 3
         result["district_id"] = district_id
 
-        result["all"], result["men"], result["women"], result["children"], result["adults"], result["employable"], result["employable_men"], result["employable_women"] = r[1], r[2], r[3], r[4]+r[5]+r[8], r[7], r[11], r[12], r[13]
+        result["all"], result["men"], result["women"], result["children"], result["teenagers"], result["adults"], result["employable"], result["employable_men"], result["employable_women"] = r[1], r[2], r[3], r[4]+r[5]+r[8], r[7], r[11], r[12], r[13]
 
         results.append(result)
     return results
@@ -173,7 +173,7 @@ def parse_reprod(xls_file, districts):
         else:
             district_id = 3
         result["district_id"] = district_id
-        result["borned"], result["borned_1000"], result["died"], result["died_1000"], result["nat_add"], result["nat_add_1000"] = r[1:]
+        result["borned"], result["died"], result["nat_add"] = r[1:]
         results.append(result)
     return results
 

@@ -92,4 +92,4 @@ ENV/
 
 web/data/*
 web/static/downloads/*
-
+web/temp/*
