@@ -170,7 +170,11 @@ def markers_map():
 
 @app.route('/disease_map')
 def disease_map():
-    polygons = _get_polygons()
+    criteria = dict()
+    if criteria != {}:
+        polygons = _get_polygons(criteria)
+    else:
+        polygons = {}
     gmap = Map("disease_map",
                lat=51.35, lng=46.70,
                zoom=7, style=style,
@@ -288,7 +292,7 @@ def population_map():
             query = '{}.query.filter_by(year_id={}).all()'.format(_json['key'],
                                                                   year.id)
             res = eval(query)
-            dataset['data'].append(sum([eval('x.{}'.format(mapping[_json['key']][_json['column']])) for x in res])/len(res))
+            dataset['data'].append(round(sum([eval('x.{}'.format(mapping[_json['key']][_json['column']])) for x in res])/len(res)))
 
     log.debug(dataset)
 
