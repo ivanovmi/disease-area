@@ -236,26 +236,59 @@ def population_map():
 
     log.debug(_json)
     mapping = {
-        'Population': {},
-        'Nathality': {},
-        'Morthality': {},
-        'Reprod': {},
+        'Population': {
+            "1": "all",
+            "2": "men",
+            "3": "women",
+            "4": "children",
+            "5": "teenagers",
+            "6": "adults",
+            "7": "employable",
+            "8": "country_population"
+        },
+        'Nathality': {
+            "1": "_15_17",
+            "2": "_18_24",
+            "3": "_25_29",
+            "4": "_30_34",
+            "5": "_35_older"
+        },
+        'Morthality': {
+            "1": "all_population",
+            "2": "city_population",
+            "3": "village_population",
+            "4": "died_under_1"
+        },
+        'Reprod': {
+            "1": "borned",
+            "2": "died",
+            "3": "nat_add"
+        },
         'Marriage': {
             '1': 'marriage',
             '2': 'divorce'
         },
-        'Migration': {}
+        'Migration': {
+            "1": "added",
+            "2": "substituted",
+            "3": "diff"
+        }
     }
 
     if _json is not None:
-        query = '{}.query.order_by(Marriage.id).all()'.format(_json['key'])
+        query = '{}.query.order_by({}.id).all()'.format(_json['key'], _json['key'])
         res = eval(query)
         for i in res:
             criteria[i.district_id] = eval('i.{}'.format(mapping[_json['key']][_json['column']]))
 
         dataset['label'] = mapping[_json['key']][_json['column']]
         dataset['labels'] = years[_json['key']]
-
+        dataset['data'] = []
+        for year in years[_json['key']]:
+            query = '{}.query.filter_by(year_id={}).all()'.format(_json['key'],
+                                                                  year.id)
+            res = eval(query)
+            dataset['data'].append(sum([eval('x.{}'.format(mapping[_json['key']][_json['column']])) for x in res])/len(res))
 
     log.debug(dataset)
 
