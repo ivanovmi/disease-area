@@ -274,7 +274,7 @@ def population_map():
         },
         'Migration': {
             "1": "added",
-            "2": "substituted",
+            "2": "substituded",
             "3": "diff"
         }
     }
