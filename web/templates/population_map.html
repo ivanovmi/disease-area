@@ -1,5 +1,13 @@
 {% extends "_base.html" %}
-
+{% block css %}
+    <style>
+    #legend_div {
+        font-family: Arial, sans-serif;
+        padding: 10px;
+        margin: 10px;
+        }
+      </style>
+{% endblock %}
 {% block js %}
 <script>
 
@@ -22,7 +30,6 @@
         });
 
    {% endfor %}
-
 </script>
     <script type="text/javascript" charset="utf-8">
     function submit(form){
@@ -321,10 +328,27 @@
         <td>
 <div id="gmap-menu">
 </div>
+            <div id='legend_div' {% if dataset == {} %}style="display:none;"{% endif %}>
+            {{ dataset['min'] }}
+        <canvas id="legend" width="200" height="20" ></canvas>
+                {{ dataset['max'] }}
+        <script>
+            var c=document.getElementById("legend");
+            var ctx=c.getContext("2d");
+
+            var grd=ctx.createLinearGradient(0,0,170,0);
+            grd.addColorStop(0,"red");
+            grd.addColorStop(1,"green");
+
+            ctx.fillStyle=grd;
+            ctx.fillRect(15,15,150,15);
+        </script>
+    </div>
         </td>
     </tr>
     </table>
 </div>
+
     <canvas id="myChart" width="1210" height="300" {% if dataset == {} %}style="display:none;"{% endif %}></canvas>
 <script>
 var ctx = document.getElementById("myChart");

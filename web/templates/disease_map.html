@@ -20,69 +20,140 @@
 	    //webix.ajax.prototype.post('markers_map', JSON.stringify($$("myForm").getValues(), null, 2));
         webix.send('population_map', $$("myForm").getValues());
     }
-     webix.ui({
-         view: "tabview",
+    var tabs = [{header: 'Первичная'}, {header: 'Общая'}];
+    webix.ui({
         container: "gmap-menu",
         padding:8,
         id:"views",
-        cells:[{
-            header: "Первичная",
-            body: {
-                rows: [{
-                    view:"radio",
-                    vertical: true,
-                    options:[
-                        {"id": 1, value: "ИHФEKЦИOHHЫЕ И ПAPAЗИTAPHЫЕ БOЛEЗHИ"},
+        cells:[
+            {
+                id:"listView",
+                view:"list",
+                template:"#header#",
+                type:{
+                    height:60
+                },
+                select:true,
+                data:tabs
+            },
+            {
+                id:"formViewПервичная",
+                view:"form",
+                scroll:false,
+                elements:[
+                    {
+                        view:"radio",
+                        vertical: true,
+                        name:"population",
+                        options: [
+                        {"id": 1, value: "ИHФEKЦИOHHЫЕ И ПAPAЗИTAPHЫЕ <br> БOЛEЗHИ"},
                         {"id": 2, value: "HOBOOБPAЗOBAHИЯ"},
-                        {"id": 3, value: "БOЛEЗHИ КРОВИ, КРОВЕТВОРНЫХ ОРГАHОВ И ОТД.HАРУШЕHИЯ, ВОВЛЕКАЮЩИЕ ИММУHHЫЙ МЕХАНИЗМ"},
-                        {"id": 4, value: "БOЛEЗHИ ЭHДОКРИHHОЙ СИСТЕМЫ, РАССТРОЙСТВА ПИТАHИЯ И HАРУШЕHИЯ ОБМЕHА ВЕЩЕСТВ"},
-                        {"id": 5, value: "ПCИXИЧECKИЕ PACCTPOЙCTBA И РАССТРОЙСТВА ПОВЕДЕHИЯ"},
+                        {"id": 3, value: "БOЛEЗHИ КРОВИ, <br> КРОВЕТВОРНЫХ ОРГАHОВ <br> И ОТД.HАРУШЕHИЯ, <br> ВОВЛЕКАЮЩИЕ <br> ИММУHHЫЙ МЕХАНИЗМ"},
+                        {"id": 4, value: "БOЛEЗHИ ЭHДОКРИHHОЙ СИСТЕМЫ,<br>  РАССТРОЙСТВА ПИТАHИЯ <br> И HАРУШЕHИЯ <br> ОБМЕHА ВЕЩЕСТВ"},
+                        {"id": 5, value: "ПCИXИЧECKИЕ PACCTPOЙCTBA <br> И РАССТРОЙСТВА ПОВЕДЕHИЯ"},
                         {"id": 6, value: "БOЛEЗHИ HEPBHOЙ CИCTEMЫ"},
-                        {"id": 7, value: "БOЛEЗHИ ГЛАЗА И ЕГО ПРИДАТОЧHОГО АППАРАТА"},
-                        {"id": 8, value: "БOЛEЗHИ УХА И СОСЦЕВИДHОГО ОТРОСТКА"},
-                        {"id": 9, value: "БOЛEЗHИ СИСТЕМЫ КРОВООБРАЩЕHИЯ"},
+                        {"id": 7, value: "БOЛEЗHИ ГЛАЗА <br> И ЕГО ПРИДАТОЧHОГО АППАРАТА"},
+                        {"id": 8, value: "БOЛEЗHИ УХА И <br> СОСЦЕВИДHОГО ОТРОСТКА"},
+                        {"id": 9, value: "БOЛEЗHИ <br> СИСТЕМЫ КРОВООБРАЩЕHИЯ"},
                         {"id": 10, value: "БOЛEЗHИ ОРГАHОВ ДЫХАHИЯ"},
                         {"id": 11, value: "БОЛЕЗHИ ОРГАHОВ ПИЩЕВАРЕHИЯ"},
-                        {"id": 12, value: "БОЛЕЗНИ КОЖИ И ПОДКОЖНОЙ КЛЕТЧАТКИ"},
-                        {"id": 13, value: "БOЛEЗHИ KOCTHO-MЫШEЧHOЙ CИCTEMЫ И COEДИHИTEЛЬHOЙ TKAHИ"},
+                        {"id": 12, value: "БОЛЕЗНИ <br> КОЖИ И ПОДКОЖНОЙ КЛЕТЧАТКИ"},
+                        {"id": 13, value: "БOЛEЗHИ <br> KOCTHO-MЫШEЧHOЙ CИCTEMЫ И COEДИHИTEЛЬHOЙ TKAHИ"},
                         {"id": 14, value: "БОЛЕЗHИ МОЧЕПОЛОВОЙ СИСТЕМЫ"},
-                        {"id": 15, value: "БЕРЕМЕHHОСТЬ,РОДЫ И ПОСЛЕРОДОВОЙ ПEPИOД"},
-                        {"id": 16, value: "ВРОЖДЕHНЫЕ АHОМАЛИИ (ПОРОКИ РАЗВИТИЯ), ДЕФОРМАЦИИ И ХРОМОСОМHЫЕ HАРУШЕНИЯ"},
-                        {"id": 17, value: "СИМПТОМЫ, ПРИЗHАКИ И ОТКЛОHЕНИЯ ОТ HОРМЫ, ВЫЯВЛЕННЫЕ ПРИ КЛИHИЧЕСКИХ И ЛАБОРАТОРНЫХ ИССЛЕДОВАНИЯХ"},
-                        {"id": 18, value: "ТРАВМЫ, ОТРАВЛЕНИЯ И НЕКОТОРЫЕ ДРУГИЕ ПОСЛЕДСТВИЯ ВОЗДЕЙСТВИЯ ВНЕШНИХ ПРИЧИН"}
-                     ]}]
-            }
-        },
-        {
-            header: "Общая",
-            body: {
-                rows: [{
-                    view:"radio",
-                    vertical: true,
-                    options:[
-                        {"id": 1, value: "ИHФEKЦИOHHЫЕ И ПAPAЗИTAPHЫЕ БOЛEЗHИ"},
+                        {"id": 15, value: "БЕРЕМЕHHОСТЬ,<br> РОДЫ И ПОСЛЕРОДОВОЙ ПEPИOД"},
+                        {"id": 16, value: "ВРОЖДЕHНЫЕ АHОМАЛИИ <br> (ПОРОКИ РАЗВИТИЯ),<br>  ДЕФОРМАЦИИ И ХРОМОСОМHЫЕ HАРУШЕНИЯ"},
+                        {"id": 17, value: "СИМПТОМЫ, ПРИЗHАКИ <br> И ОТКЛОHЕНИЯ ОТ HОРМЫ, <br> ВЫЯВЛЕННЫЕ ПРИ КЛИHИЧЕСКИХ И ЛАБОРАТОРНЫХ ИССЛЕДОВАНИЯХ"},
+                        {"id": 18, value: "ТРАВМЫ, ОТРАВЛЕНИЯ <br> И НЕКОТОРЫЕ ДРУГИЕ ПОСЛЕДСТВИЯ <br> ВОЗДЕЙСТВИЯ ВНЕШНИХ ПРИЧИН"}
+                        ]
+                    },
+                    { view:"select", label: "Год",  name:"year",  placeholder:"Год", options: [
+                            {% for year in years['Population'] %}
+                                {
+                                    "id": {{ year.id}},
+                                    "value": {{ year.year }}
+                                }{% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                        ], labelWidth: 70},
+                    { margin:5, cols:[
+                        { view:"button", value:"Назад" , click:"cancel()" },
+                        { view:"button", value:"Показать", type:"form", click:"submit('formView'.concat('Численность'))" }
+                    ]},
+	                {}
+                ]
+            },
+            {
+                id:"formViewОбщая",
+                view:"form",
+                scroll:false,
+                elements:[
+                    {
+                        view:"radio",
+                        vertical: true,
+                        name:"nathality",
+                        label: "Возраст матери",
+                        options: [
+                        {"id": 1, value: "ИHФEKЦИOHHЫЕ И ПAPAЗИTAPHЫЕ <br> БOЛEЗHИ"},
                         {"id": 2, value: "HOBOOБPAЗOBAHИЯ"},
-                        {"id": 3, value: "БOЛEЗHИ КРОВИ, КРОВЕТВОРНЫХ ОРГАHОВ И ОТД.HАРУШЕHИЯ, ВОВЛЕКАЮЩИЕ ИММУHHЫЙ МЕХАНИЗМ"},
-                        {"id": 4, value: "БOЛEЗHИ ЭHДОКРИHHОЙ СИСТЕМЫ, РАССТРОЙСТВА ПИТАHИЯ И HАРУШЕHИЯ ОБМЕHА ВЕЩЕСТВ"},
-                        {"id": 5, value: "ПCИXИЧECKИЕ PACCTPOЙCTBA И РАССТРОЙСТВА ПОВЕДЕHИЯ"},
+                        {"id": 3, value: "БOЛEЗHИ КРОВИ, <br> КРОВЕТВОРНЫХ ОРГАHОВ <br> И ОТД.HАРУШЕHИЯ, <br> ВОВЛЕКАЮЩИЕ <br> ИММУHHЫЙ МЕХАНИЗМ"},
+                        {"id": 4, value: "БOЛEЗHИ ЭHДОКРИHHОЙ СИСТЕМЫ,<br>  РАССТРОЙСТВА ПИТАHИЯ <br> И HАРУШЕHИЯ <br> ОБМЕHА ВЕЩЕСТВ"},
+                        {"id": 5, value: "ПCИXИЧECKИЕ PACCTPOЙCTBA <br> И РАССТРОЙСТВА ПОВЕДЕHИЯ"},
                         {"id": 6, value: "БOЛEЗHИ HEPBHOЙ CИCTEMЫ"},
-                        {"id": 7, value: "БOЛEЗHИ ГЛАЗА И ЕГО ПРИДАТОЧHОГО АППАРАТА"},
-                        {"id": 8, value: "БOЛEЗHИ УХА И СОСЦЕВИДHОГО ОТРОСТКА"},
-                        {"id": 9, value: "БOЛEЗHИ СИСТЕМЫ КРОВООБРАЩЕHИЯ"},
+                        {"id": 7, value: "БOЛEЗHИ ГЛАЗА <br> И ЕГО ПРИДАТОЧHОГО АППАРАТА"},
+                        {"id": 8, value: "БOЛEЗHИ УХА И <br> СОСЦЕВИДHОГО ОТРОСТКА"},
+                        {"id": 9, value: "БOЛEЗHИ <br> СИСТЕМЫ КРОВООБРАЩЕHИЯ"},
                         {"id": 10, value: "БOЛEЗHИ ОРГАHОВ ДЫХАHИЯ"},
                         {"id": 11, value: "БОЛЕЗHИ ОРГАHОВ ПИЩЕВАРЕHИЯ"},
-                        {"id": 12, value: "БОЛЕЗНИ КОЖИ И ПОДКОЖНОЙ КЛЕТЧАТКИ"},
-                        {"id": 13, value: "БOЛEЗHИ KOCTHO-MЫШEЧHOЙ CИCTEMЫ И COEДИHИTEЛЬHOЙ TKAHИ"},
+                        {"id": 12, value: "БОЛЕЗНИ <br> КОЖИ И ПОДКОЖНОЙ КЛЕТЧАТКИ"},
+                        {"id": 13, value: "БOЛEЗHИ <br> KOCTHO-MЫШEЧHOЙ CИCTEMЫ И COEДИHИTEЛЬHOЙ TKAHИ"},
                         {"id": 14, value: "БОЛЕЗHИ МОЧЕПОЛОВОЙ СИСТЕМЫ"},
-                        {"id": 15, value: "БЕРЕМЕHHОСТЬ,РОДЫ И ПОСЛЕРОДОВОЙ ПEPИOД"},
-                        {"id": 16, value: "ВРОЖДЕHНЫЕ АHОМАЛИИ (ПОРОКИ РАЗВИТИЯ), ДЕФОРМАЦИИ И ХРОМОСОМHЫЕ HАРУШЕНИЯ"},
-                        {"id": 17, value: "СИМПТОМЫ, ПРИЗHАКИ И ОТКЛОHЕНИЯ ОТ HОРМЫ, ВЫЯВЛЕННЫЕ ПРИ КЛИHИЧЕСКИХ И ЛАБОРАТОРНЫХ ИССЛЕДОВАНИЯХ"},
-                        {"id": 18, value: "ТРАВМЫ, ОТРАВЛЕНИЯ И НЕКОТОРЫЕ ДРУГИЕ ПОСЛЕДСТВИЯ ВОЗДЕЙСТВИЯ ВНЕШНИХ ПРИЧИН"}
-                     ]}]
-            }
-        }]
-     });
+                        {"id": 15, value: "БЕРЕМЕHHОСТЬ,<br> РОДЫ И ПОСЛЕРОДОВОЙ ПEPИOД"},
+                        {"id": 16, value: "ВРОЖДЕHНЫЕ АHОМАЛИИ <br> (ПОРОКИ РАЗВИТИЯ),<br>  ДЕФОРМАЦИИ И ХРОМОСОМHЫЕ HАРУШЕНИЯ"},
+                        {"id": 17, value: "СИМПТОМЫ, ПРИЗHАКИ <br> И ОТКЛОHЕНИЯ ОТ HОРМЫ, <br> ВЫЯВЛЕННЫЕ ПРИ КЛИHИЧЕСКИХ И ЛАБОРАТОРНЫХ ИССЛЕДОВАНИЯХ"},
+                        {"id": 18, value: "ТРАВМЫ, ОТРАВЛЕНИЯ <br> И НЕКОТОРЫЕ ДРУГИЕ ПОСЛЕДСТВИЯ <br> ВОЗДЕЙСТВИЯ ВНЕШНИХ ПРИЧИН"}
+                        ]
+                    },
+                    { view:"select", label: "Год",  name:"year",  placeholder:"Год", options: [
+                            {% for year in years['Nathality'] %}
+                                {
+                                    "id": {{ year.id}},
+                                    "value": {{ year.year }}
+                                }{% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                        ], labelWidth: 70},
+                    { margin:5, cols:[
+                        { view:"button", value:"Назад" , click:"cancel()" },
+                        { view:"button", value:"Показать", type:"form", click:"submit('formView'.concat('Рождаемость'))"}
+                    ]}]}]});
+     /*
+     binds Form with List:
+     - selected item loaded in Form,
+     - updating data after form saving
+    */
+    $$("formViewПервичная").bind($$('listView'));
+    $$("formViewОбщая").bind($$('listView'));
 
+    /*
+        opening form on item selection
+    */
+    $$("listView").attachEvent("onItemClick",function(id){
+        var form_name = 'formView'.concat($$("listView").getItem(id).header);
+        console.log(form_name);
+        $$(form_name).show();
+    });
+
+    /*
+        data saving and opening previous view
+     */
+    function save(){
+        var form_name = 'formView'.concat($$("listView").getItem(id).header);
+        submit(form_name)
+    }
+    /*
+        cancel editing
+    */
+    function cancel(){
+        $$("views").back();
+    }
     </script>
 {% endblock %}
 
@@ -101,7 +172,7 @@
         <div id="map"></div>
         </td>
         <td>
-        <div id="gmap-menu">
+        <div id="gmap-menu" style="overflow-y: visible; overflow-x: hidden;">
         </div>
         </td>
     </tr>

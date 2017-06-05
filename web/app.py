@@ -168,19 +168,38 @@ def markers_map():
                            mark=mrkrs, dist=districts, colors=color)
 
 
-@app.route('/disease_map')
+@app.route('/disease_map', methods=["GET", "POST"])
 def disease_map():
     criteria = dict()
     if criteria != {}:
         polygons = _get_polygons(criteria)
     else:
         polygons = {}
+    years = {
+        'Population': list(map(str, list(set([x.year_id for x in
+                                              Population.query.order_by(
+                                                  Population.year).all()])))),
+        'Nathality': [_get_year_by_id(x) for x in list(set([x.year_id for x in
+                                                            Nathality.query.order_by(
+                                                                Nathality.year_id).all()]))],
+        'Morthality': [_get_year_by_id(x) for x in list(set([x.year_id for x in
+                                                             Morthality.query.order_by(
+                                                                 Morthality.year_id).all()]))],
+        'Reprod': [_get_year_by_id(x) for x in list(set(
+            [x.year_id for x in Reprod.query.order_by(Reprod.year_id).all()]))],
+        'Marriage': [_get_year_by_id(x) for x in list(set([x.year_id for x in
+                                                           Marriage.query.order_by(
+                                                               Marriage.year_id).all()]))],
+        'Migration': [_get_year_by_id(x) for x in list(set([x.year_id for x in
+                                                            Migration.query.order_by(
+                                                                Migration.year_id).all()]))]
+    }
     gmap = Map("disease_map",
                lat=51.35, lng=46.70,
                zoom=7, style=style,
                cluster=True, cluster_gridsize=10, polygons=polygons)
     return render_template('disease_map.html', navigation=navigation,
-                           gmap=gmap, poly=polygons)
+                           gmap=gmap, poly=polygons, years=years)
 
 
 @app.route('/population_map', methods=["GET", "POST"])
@@ -292,7 +311,10 @@ def population_map():
             query = '{}.query.filter_by(year_id={}).all()'.format(_json['key'],
                                                                   year.id)
             res = eval(query)
-            dataset['data'].append(round(sum([eval('x.{}'.format(mapping[_json['key']][_json['column']])) for x in res])/len(res)))
+            data = [eval('x.{}'.format(mapping[_json['key']][_json['column']])) for x in res]
+            dataset['data'].append(round(sum(data)/len(res)))
+            dataset['min'] = min(data)
+            dataset['max'] = max(data)
 
     log.debug(dataset)
 
@@ -602,28 +624,29 @@ def disease_population():
     if request.method == 'POST':
         log.debug(request.form)
 
-        year = request.form.get('year')
-        children = request.form.get('children')
-        children_observed = request.form.get('children_observed')
-        adults = request.form.get('adults')
-        adults_observed = request.form.get('adults_observed')
-        hospital_id = request.form.get('hospital_id')
-        disease_id = request.form.get('disease_id')
+        if request.files:
+            all_districts = list(map(str, District.query.order_by(District.id).all()))
+            all_diseases = dict()
+            for x in Disease.query.order_by(Disease.id).all():
+                all_diseases[x.name] = x.id
+            log.debug(request.files)
+            if request.files.get('dp_file'):
+                f = request.files['dp_file']
+                f.save(os.path.join(app.config['UPLOAD_FOLDER'],
+                                    secure_filename(f.filename)))
+                reprod = xls_parser.parse_diseases(
+                    os.path.join(app.config['UPLOAD_FOLDER'],
+                                 secure_filename(f.filename)),
+                    all_districts, all_diseases)
 
-        disease = _get_disease_by_id(disease_id)
-        hospital = _get_hospital_by_id(hospital_id)
+                for i in reprod:
+                    add_new_year(year=i["year"])
 
-        if year and disease and hospital:
-            db.session.add(DiseasePopulation(year=year,
-                                             children=children,
-                                             children_observed=children_observed,
-                                             adults=adults,
-                                             adults_observed=adults_observed,
-                                             hospital=hospital,
-                                             disease=disease,
-                                             )
-                           )
-            db.session.commit()
+                    i["year_id"] = Year.query.filter_by(
+                        year=i["year"]).first().id
+                    # del i["year"]
+                    db.session.add(DiseasePopulation(**i))
+                    db.session.commit()
 
     return render_template('disease_population.html',
                            disease_populations=_get_all_disease_population(),

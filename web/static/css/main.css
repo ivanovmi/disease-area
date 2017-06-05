@@ -16,8 +16,8 @@ body{
 #gmap-menu {
   max-height: 550px;
   min-height: 550px;
-  min-width: 340px;
-  max-width: 340px;
+  min-width: 370px;
+  max-width: 370px;
   overflow: hidden;
   margin-left: 8px;
 }

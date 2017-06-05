@@ -8,6 +8,15 @@
     <div class="text-center">
         {% include "_navigation.html" %}
         {% include "_admin_navigation.html" %}
+        <div>
+            <fieldset>
+                <legend>Заболеваемость населения</legend>
+            <form class="form" action="/disease_population" method="POST" enctype="multipart/form-data">
+                <input type=file name="dp_file">
+                <input type=submit value=Загрузить>
+                {#{ file_input('reprod_file') }#}
+                </form>
+            </fieldset></div>
         <button type="button" class="btn btn-info from-group"
                 data-toggle="collapse"
                 data-target="#collapse-input">Добавить новый элемент
@@ -27,44 +36,5 @@
         </div>
     </div>
 </div>
-{% if disease_populations %}
-<div class="data-container">
-    <h2>Disease population</h2>
-    <p>The table represents data about diseases</p>
-    <div class="table-responsive">
-        <table class="table table-condensed">
-            <thead>
-            <tr>
-                <th></th>
-                <th>#</th>
-                <th>Year</th>
-                <th>Hosptial</th>
-                <th>Disease</th>
-                <th>Adults</th>
-                <th>Children</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for disease_population in disease_populations %}
-            <tr>
-                <form action="/disease_population/delete" method="POST">
-                    <input type="hidden" name="disease_population_id"
-                           value="{{disease_population.id}}">
-                    <td>{{ submit('delete') }}</td>
-                    <td>{{disease_population.id}}</td>
-                    <td>{{disease_population.year}}</td>
-                    <td>{{disease_population.hospital.name}}</td>
-                    <td>{{disease_population.disease.name}}</td>
-                    <td>{{disease_population.adults}}</td>
-                    <td>{{disease_population.children}}</td>
-                </form>
-            </tr>
-            </tbody>
-            {% endfor %}
-        </table>
-    </div>
-</div>
-
-{% endif %}
 {% endblock %}
 
