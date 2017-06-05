@@ -29,11 +29,8 @@
             <hr/>
             <form class="form" action="/population" method="POST" name="reprod">
                 {{ text_input('borned','Введите число родившихся...') }}
-                {{ text_input('borned_1000','Введите число родившихся на тысячу населения...') }}
                 {{ text_input('died','Введите число умерших...') }}
-                {{ text_input('died_1000','Введите число умерших на тысячу населения...') }}
                 {{ text_input('nat_add','Введите размер естественного прироста...') }}
-                {{ text_input('nat_add_1000','Введите размер естественного прироста на тысячу населения...') }}
                 {{ select('district') }}
                 {{ select('year') }}
                 {{ submit('add') }}
