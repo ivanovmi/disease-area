@@ -178,7 +178,7 @@ def parse_reprod(xls_file, districts):
     return results
 
 
-def parse_diseases(xls_file, districts, diseases):
+def parse_diseases(xls_file, districts, diseases, db):
     child_sheet = get_sheet(xls_file)
     teen_sheet = get_sheet(xls_file, 1)
     adult_sheet = get_sheet(xls_file, 2)
@@ -267,12 +267,32 @@ def parse_diseases(xls_file, districts, diseases):
                 else:
                     district_id = 3
                 result["district_id"] = district_id
-                result['children'] = child_sheet.row_values(row)[2:][years.index(year)*disease_id]
-                result['teenagers'] = teen_sheet.row_values(row)[2:][years.index(year)*disease_id]
-                result['adults'] = adult_sheet.row_values(row)[2:][years.index(year)*disease_id]
-                print(result)
-                results.append(result)
-    return results
+
+                if not isinstance(child_sheet.row_values(row)[2:][years.index(year) * disease_id], str):
+                    result['children'] = child_sheet.row_values(row)[2:][years.index(year) * disease_id]
+                else:
+                    result['children'] = 0
+
+                if not isinstance(teen_sheet.row_values(row)[2:][years.index(year) * disease_id], str):
+                    result['teenagers'] = teen_sheet.row_values(row)[2:][years.index(year) * disease_id]
+                else:
+                    result['teenagers'] = 0
+
+                if not isinstance(adult_sheet.row_values(row)[2:][years.index(year) * disease_id], str):
+                    result['adults'] = adult_sheet.row_values(row)[2:][years.index(year) * disease_id]
+                else:
+                    result['adults'] = 0
+
+                if not models.Year.query.filter_by(year=result["year"]).first():
+                    db.session.add(models.Year(year=result["year"]))
+                    db.session.commit()
+
+                result["year_id"] = models.Year.query.filter_by(
+                    year=result["year"]).first().id
+                # del i["year"]
+                db.session.add(models.DiseasePopulation(**result))
+        db.session.commit()
+
 
 if __name__ == "__main__":
     all_districts = list(map(str,

@@ -194,12 +194,8 @@ def disease_map():
                                                             Migration.query.order_by(
                                                                 Migration.year_id).all()]))]
     }
-    gmap = Map("disease_map",
-               lat=51.35, lng=46.70,
-               zoom=7, style=style,
-               cluster=True, cluster_gridsize=10, polygons=polygons)
     return render_template('disease_map.html', navigation=navigation,
-                           gmap=gmap, poly=polygons, years=years)
+                           poly=polygons, years=years)
 
 
 @app.route('/population_map', methods=["GET", "POST"])
@@ -634,19 +630,12 @@ def disease_population():
                 f = request.files['dp_file']
                 f.save(os.path.join(app.config['UPLOAD_FOLDER'],
                                     secure_filename(f.filename)))
-                reprod = xls_parser.parse_diseases(
+                xls_parser.parse_diseases(
                     os.path.join(app.config['UPLOAD_FOLDER'],
                                  secure_filename(f.filename)),
-                    all_districts, all_diseases)
+                    all_districts, all_diseases, db)
 
-                for i in reprod:
-                    add_new_year(year=i["year"])
-
-                    i["year_id"] = Year.query.filter_by(
-                        year=i["year"]).first().id
-                    # del i["year"]
-                    db.session.add(DiseasePopulation(**i))
-                    db.session.commit()
+            return redirect(url_for('disease_population'))
 
     return render_template('disease_population.html',
                            disease_populations=_get_all_disease_population(),
@@ -839,6 +828,18 @@ AAFF00
 11FF00
 00FF00"""
 
+'''
+heat_map = """CC0033
+FF0033
+FF3333
+FF6666
+FF9999
+99CC99
+66CC66
+669966
+339933
+006600"""
+'''
 
 def _get_polygons(criteria):
     polygons = []
@@ -847,7 +848,9 @@ def _get_polygons(criteria):
     h = heat_map.split('\n')
     _s = sorted(criteria, key=criteria.get)
     for i in range(len(_s)):
+        log.debug(_s[i])
         map_colors[_s[i]] = h[i]
+    log.debug(map_colors)
 
     for district in districts:
         pol = {
@@ -867,45 +870,6 @@ def _get_polygons(criteria):
 
     return polygons
 
-
-def generate_json(div_id="gmap-menu"):
-    json_template = {"container": div_id,
-                     "view": "tree",
-                     "template": "{common.icon()} {common.checkbox()} #value#",
-                     "threeState": True,
-                     "data": [],
-                     "ready": "function(){this.openAll();}"}
-
-    _hospitals = _get_all_hospitals()
-    _districts = _get_all_districts()
-    districts = dict() #OrderedDict()
-
-    for district in _districts:
-        districts[district.name] = []
-
-    for hospital in _hospitals:
-        districts[hospital.district.name].append(hospital.name)
-
-    id_base = 1
-    for key, value in districts.items():
-        if value != []:
-            tmp = dict()
-            tmp['id'] = str(id_base)
-            tmp['value'] = key
-            tmp['data'] = []
-            id_sec = 1
-            for el in value:
-                sec_tmp = dict()
-                sec_tmp['id'] = '{}.{}'.format(id_base, id_sec)
-                sec_tmp['value'] = el
-                tmp['data'].append(sec_tmp)
-                id_sec += 1
-            json_template['data'].append(tmp)
-            id_base += 1
-    with open('static/js/data.json', 'w') as js_file:
-        json.dump(json_template['data'], js_file, ensure_ascii=False)
-
-    return json_template
 
 if __name__ == '__main__':
     from os import path

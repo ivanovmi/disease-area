@@ -357,12 +357,27 @@ var l = [];
     l.push('{{ label.year }}');
 {% endfor %}
 
+var dm = {
+    city_population: 'Городское население',
+    all_population: 'Всего людей',
+    village_population: 'Cельское население',
+    died_under_1: 'Детей до года',
+    borned: 'Родившиеся',
+    died: 'Умершие',
+    marriage: 'Браки',
+    divorce: 'Разводы',
+    added: 'Прибывшие',
+    substituted: 'Выбывшие',
+    diff: 'Миграционный прирост'
+};
+
 var data = {
 
     labels: l,
     datasets: [
         {
-            label: '{{ dataset['label'] }}',
+            label: dm["{{ dataset['label'] }}"],
+            //label: '{{ dataset['label'] }}',
             fill: false,
             lineTension: 0,
             backgroundColor: "rgba(75,192,192,0.4)",

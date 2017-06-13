@@ -6,6 +6,6 @@ from wtforms.validators import InputRequired
 
 
 class LoginForm(Form):
-    username = StringField('Username', [InputRequired()])
-    password = PasswordField('Password', [InputRequired()])
-    login = SubmitField('Login')
+    username = StringField('Имя пользователя', [InputRequired()])
+    password = PasswordField('Пароль', [InputRequired()])
+    login = SubmitField('Войти')
