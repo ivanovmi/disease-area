@@ -22,6 +22,10 @@ body{
   margin-left: 8px;
 }
 
+.webix_label_right {
+  white-space: normal !important;
+}
+
 hr {
   margin-top: -0.003em;
   width: 1106px;

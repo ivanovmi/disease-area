@@ -170,32 +170,52 @@ def markers_map():
 
 @app.route('/disease_map', methods=["GET", "POST"])
 def disease_map():
+    if request.method == "POST":
+        log.debug(request.form)
+        _json = dict()
+        _json['year_id'] = request.form.get('year')
+        if request.form.get('header') == 'Первичная':
+            key = 'first'
+        elif request.form.get('header') == 'Общая':
+            key = 'all'
+        _json['column'] = request.form.get(key.lower())
+        _json['key'] = key
+        return redirect(url_for('disease_map')+'?{}'.format(_json))
+
+    _json = request.args
     criteria = dict()
+
+    years = {
+        'first': [_get_year_by_id(x) for x in list(set([x.year_id for x in DiseasePopulation.query.order_by(DiseasePopulation.is_first).all() if x.is_first == 1]))],
+        'all': [_get_year_by_id(x) for x in list(set([x.year_id for x in DiseasePopulation.query.order_by(DiseasePopulation.is_first).all() if x.is_first == 0]))]
+    }
+
+    try:
+        _json = next(iter(_json))
+    except StopIteration:
+        _json = None
+
+    try:
+        _json = ast.literal_eval(_json)
+    except ValueError:
+        _json = None
+
+    log.debug(_json)
+
+    if _json is not None:
+        query = 'DiseasePopulation.query.filter_by(disease_id={}, is_first={}, year_id={}).all()'.format(_json['column'], 1 if _json['key'] == 'first' else 0, _json['year_id'])
+        res = eval(query)
+        for i in res:
+            criteria[i.district_id] = i.children + i.teenagers + i.adults
+
     if criteria != {}:
         polygons = _get_polygons(criteria)
     else:
         polygons = {}
-    years = {
-        'Population': list(map(str, list(set([x.year_id for x in
-                                              Population.query.order_by(
-                                                  Population.year).all()])))),
-        'Nathality': [_get_year_by_id(x) for x in list(set([x.year_id for x in
-                                                            Nathality.query.order_by(
-                                                                Nathality.year_id).all()]))],
-        'Morthality': [_get_year_by_id(x) for x in list(set([x.year_id for x in
-                                                             Morthality.query.order_by(
-                                                                 Morthality.year_id).all()]))],
-        'Reprod': [_get_year_by_id(x) for x in list(set(
-            [x.year_id for x in Reprod.query.order_by(Reprod.year_id).all()]))],
-        'Marriage': [_get_year_by_id(x) for x in list(set([x.year_id for x in
-                                                           Marriage.query.order_by(
-                                                               Marriage.year_id).all()]))],
-        'Migration': [_get_year_by_id(x) for x in list(set([x.year_id for x in
-                                                            Migration.query.order_by(
-                                                                Migration.year_id).all()]))]
-    }
+
+    diseases = _get_all_diseases()
     return render_template('disease_map.html', navigation=navigation,
-                           poly=polygons, years=years)
+                           poly=polygons, years=years, diseases=diseases)
 
 
 @app.route('/population_map', methods=["GET", "POST"])

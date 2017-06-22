@@ -12,13 +12,24 @@
   lng: 46.70,
     zoom: 7
 });
+{% for p in poly %}
+        polygon = map.drawPolygon({
+            paths: {{ p['path'] }}, // pre-defined polygon shape
+            strokeColor: '{{ p['stroke_color'] }}',
+            strokeOpacity: {{ p['stroke_opacity'] }},
+            strokeWeight: {{ p['stroke_weight'] }},
+            fillColor: '#{{ p['fill_color'] }}',
+            fillOpacity: 0.5
+        });
+
+   {% endfor %}
 </script>
   <!-- Подключение JS для google карты -->
 
     <script type="text/javascript" charset="utf-8">
-    function submit(){
+    function submit(form){
 	    //webix.ajax.prototype.post('markers_map', JSON.stringify($$("myForm").getValues(), null, 2));
-        webix.send('population_map', $$("myForm").getValues());
+        webix.send('disease_map', $$(form).getValues());
     }
     var tabs = [{header: 'Первичная'}, {header: 'Общая'}];
     webix.ui({
@@ -43,31 +54,18 @@
                 elements:[
                     {
                         view:"radio",
+                        width:300,
+                        height: 1050,
                         vertical: true,
-                        name:"population",
+                        name:"first",
                         options: [
-                        {"id": 1, value: "ИHФEKЦИOHHЫЕ И ПAPAЗИTAPHЫЕ <br> БOЛEЗHИ"},
-                        {"id": 2, value: "HOBOOБPAЗOBAHИЯ"},
-                        {"id": 3, value: "БOЛEЗHИ КРОВИ, <br> КРОВЕТВОРНЫХ ОРГАHОВ <br> И ОТД.HАРУШЕHИЯ, <br> ВОВЛЕКАЮЩИЕ <br> ИММУHHЫЙ МЕХАНИЗМ"},
-                        {"id": 4, value: "БOЛEЗHИ ЭHДОКРИHHОЙ СИСТЕМЫ,<br>  РАССТРОЙСТВА ПИТАHИЯ <br> И HАРУШЕHИЯ <br> ОБМЕHА ВЕЩЕСТВ"},
-                        {"id": 5, value: "ПCИXИЧECKИЕ PACCTPOЙCTBA <br> И РАССТРОЙСТВА ПОВЕДЕHИЯ"},
-                        {"id": 6, value: "БOЛEЗHИ HEPBHOЙ CИCTEMЫ"},
-                        {"id": 7, value: "БOЛEЗHИ ГЛАЗА <br> И ЕГО ПРИДАТОЧHОГО АППАРАТА"},
-                        {"id": 8, value: "БOЛEЗHИ УХА И <br> СОСЦЕВИДHОГО ОТРОСТКА"},
-                        {"id": 9, value: "БOЛEЗHИ <br> СИСТЕМЫ КРОВООБРАЩЕHИЯ"},
-                        {"id": 10, value: "БOЛEЗHИ ОРГАHОВ ДЫХАHИЯ"},
-                        {"id": 11, value: "БОЛЕЗHИ ОРГАHОВ ПИЩЕВАРЕHИЯ"},
-                        {"id": 12, value: "БОЛЕЗНИ <br> КОЖИ И ПОДКОЖНОЙ КЛЕТЧАТКИ"},
-                        {"id": 13, value: "БOЛEЗHИ <br> KOCTHO-MЫШEЧHOЙ CИCTEMЫ И COEДИHИTEЛЬHOЙ TKAHИ"},
-                        {"id": 14, value: "БОЛЕЗHИ МОЧЕПОЛОВОЙ СИСТЕМЫ"},
-                        {"id": 15, value: "БЕРЕМЕHHОСТЬ,<br> РОДЫ И ПОСЛЕРОДОВОЙ ПEPИOД"},
-                        {"id": 16, value: "ВРОЖДЕHНЫЕ АHОМАЛИИ <br> (ПОРОКИ РАЗВИТИЯ),<br>  ДЕФОРМАЦИИ И ХРОМОСОМHЫЕ HАРУШЕНИЯ"},
-                        {"id": 17, value: "СИМПТОМЫ, ПРИЗHАКИ <br> И ОТКЛОHЕНИЯ ОТ HОРМЫ, <br> ВЫЯВЛЕННЫЕ ПРИ КЛИHИЧЕСКИХ И ЛАБОРАТОРНЫХ ИССЛЕДОВАНИЯХ"},
-                        {"id": 18, value: "ТРАВМЫ, ОТРАВЛЕНИЯ <br> И НЕКОТОРЫЕ ДРУГИЕ ПОСЛЕДСТВИЯ <br> ВОЗДЕЙСТВИЯ ВНЕШНИХ ПРИЧИН"}
+                        {% for disease in diseases %}
+                          {"id": {{ disease.id }}, "value": "{{ disease.name }}" }{% if not loop.last %}, {% endif %}
+                        {% endfor %}
                         ]
                     },
                     { view:"select", label: "Год",  name:"year",  placeholder:"Год", options: [
-                            {% for year in years['Population'] %}
+                            {% for year in years['first'] %}
                                 {
                                     "id": {{ year.id}},
                                     "value": {{ year.year }}
@@ -76,7 +74,7 @@
                         ], labelWidth: 70},
                     { margin:5, cols:[
                         { view:"button", value:"Назад" , click:"cancel()" },
-                        { view:"button", value:"Показать", type:"form", click:"submit('formView'.concat('Численность'))" }
+                        { view:"button", value:"Показать", type:"form", click:"submit('formView'.concat('Первичная'))" }
                     ]},
 	                {}
                 ]
@@ -88,41 +86,27 @@
                 elements:[
                     {
                         view:"radio",
+                        width:300,
+                        height: 1050,
                         vertical: true,
-                        name:"nathality",
-                        label: "Возраст матери",
+                        name:"all",
                         options: [
-                        {"id": 1, value: "ИHФEKЦИOHHЫЕ И ПAPAЗИTAPHЫЕ <br> БOЛEЗHИ"},
-                        {"id": 2, value: "HOBOOБPAЗOBAHИЯ"},
-                        {"id": 3, value: "БOЛEЗHИ КРОВИ, <br> КРОВЕТВОРНЫХ ОРГАHОВ <br> И ОТД.HАРУШЕHИЯ, <br> ВОВЛЕКАЮЩИЕ <br> ИММУHHЫЙ МЕХАНИЗМ"},
-                        {"id": 4, value: "БOЛEЗHИ ЭHДОКРИHHОЙ СИСТЕМЫ,<br>  РАССТРОЙСТВА ПИТАHИЯ <br> И HАРУШЕHИЯ <br> ОБМЕHА ВЕЩЕСТВ"},
-                        {"id": 5, value: "ПCИXИЧECKИЕ PACCTPOЙCTBA <br> И РАССТРОЙСТВА ПОВЕДЕHИЯ"},
-                        {"id": 6, value: "БOЛEЗHИ HEPBHOЙ CИCTEMЫ"},
-                        {"id": 7, value: "БOЛEЗHИ ГЛАЗА <br> И ЕГО ПРИДАТОЧHОГО АППАРАТА"},
-                        {"id": 8, value: "БOЛEЗHИ УХА И <br> СОСЦЕВИДHОГО ОТРОСТКА"},
-                        {"id": 9, value: "БOЛEЗHИ <br> СИСТЕМЫ КРОВООБРАЩЕHИЯ"},
-                        {"id": 10, value: "БOЛEЗHИ ОРГАHОВ ДЫХАHИЯ"},
-                        {"id": 11, value: "БОЛЕЗHИ ОРГАHОВ ПИЩЕВАРЕHИЯ"},
-                        {"id": 12, value: "БОЛЕЗНИ <br> КОЖИ И ПОДКОЖНОЙ КЛЕТЧАТКИ"},
-                        {"id": 13, value: "БOЛEЗHИ <br> KOCTHO-MЫШEЧHOЙ CИCTEMЫ И COEДИHИTEЛЬHOЙ TKAHИ"},
-                        {"id": 14, value: "БОЛЕЗHИ МОЧЕПОЛОВОЙ СИСТЕМЫ"},
-                        {"id": 15, value: "БЕРЕМЕHHОСТЬ,<br> РОДЫ И ПОСЛЕРОДОВОЙ ПEPИOД"},
-                        {"id": 16, value: "ВРОЖДЕHНЫЕ АHОМАЛИИ <br> (ПОРОКИ РАЗВИТИЯ),<br>  ДЕФОРМАЦИИ И ХРОМОСОМHЫЕ HАРУШЕНИЯ"},
-                        {"id": 17, value: "СИМПТОМЫ, ПРИЗHАКИ <br> И ОТКЛОHЕНИЯ ОТ HОРМЫ, <br> ВЫЯВЛЕННЫЕ ПРИ КЛИHИЧЕСКИХ И ЛАБОРАТОРНЫХ ИССЛЕДОВАНИЯХ"},
-                        {"id": 18, value: "ТРАВМЫ, ОТРАВЛЕНИЯ <br> И НЕКОТОРЫЕ ДРУГИЕ ПОСЛЕДСТВИЯ <br> ВОЗДЕЙСТВИЯ ВНЕШНИХ ПРИЧИН"}
+                        {% for disease in diseases %}
+                          {"id": {{ disease.id }}, "value": "{{ disease.name }}" }{% if not loop.last %}, {% endif %}
+                        {% endfor %}
                         ]
                     },
-                    { view:"select", label: "Год",  name:"year",  placeholder:"Год", options: [
-                            {% for year in years['Nathality'] %}
+                    { view:"select", label: "Год",  name:"year",  placeholder:"Год", width: 300, options: [
+                            {% for year in years['all'] %}
                                 {
                                     "id": {{ year.id}},
                                     "value": {{ year.year }}
                                 }{% if not loop.last %}, {% endif %}
                             {% endfor %}
-                        ], labelWidth: 70},
+                        ], labelWidth: 40},
                     { margin:5, cols:[
                         { view:"button", value:"Назад" , click:"cancel()" },
-                        { view:"button", value:"Показать", type:"form", click:"submit('formView'.concat('Рождаемость'))"}
+                        { view:"button", value:"Показать", type:"form", click:"submit('formView'.concat('Общая'))"}
                     ]}]}]});
      /*
      binds Form with List:
