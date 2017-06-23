@@ -12,6 +12,10 @@ body{
   max-width: 100% !important;
 }
 
+#myLegend {
+  margin 5px;
+  padding: 5px;
+}
 
 #gmap-menu {
   max-height: 550px;
@@ -20,6 +24,10 @@ body{
   max-width: 370px;
   overflow: hidden;
   margin-left: 8px;
+}
+
+th {
+  text-align: center !important;
 }
 
 .webix_label_right {

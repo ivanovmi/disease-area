@@ -314,11 +314,13 @@ def population_map():
         }
     }
 
+    cr = dict()
     if _json is not None:
         query = '{}.query.order_by({}.id).all()'.format(_json['key'], _json['key'])
         res = eval(query)
         for i in res:
             criteria[i.district_id] = eval('i.{}'.format(mapping[_json['key']][_json['column']]))
+            cr[_get_district_by_id(i.district_id)] = eval('i.{}'.format(mapping[_json['key']][_json['column']]))
 
         dataset['label'] = mapping[_json['key']][_json['column']]
         dataset['labels'] = years[_json['key']]
@@ -332,14 +334,16 @@ def population_map():
             dataset['min'] = min(data)
             dataset['max'] = max(data)
 
+    dataset['cr'] = cr
+
     log.debug(dataset)
 
     if criteria != {}:
-        polygons = _get_polygons(criteria)
+        polygons, legend = _get_polygons(criteria)
     else:
-        polygons = {}
+        polygons = legend = {}
 
-    return render_template('population_map.html', navigation=navigation,
+    return render_template('population_map.html', navigation=navigation, legend=legend,
                            years=years, poly=polygons, dataset=dataset)
 
 
@@ -807,70 +811,34 @@ def _get_selected_markers():
         markers.append(h)
     return markers
 
+red_heat_map = """FFE6E6
+FFD8D8
+FFC5C5
+FFB0B0
+FF9A9A
+FF9A9A
+FF6868
+FF4949
+FE2C2C
+FF1212
+FF1313
+FF1414
+FF1515"""
 
-heat_map = """FF0000
-FF0050
-FF1100
-FF1150
-FF2200
-FF2250
-FF3300
-FF3350
-FF4400
-FF4450
-FF5500
-FF5550
-FF6600
-FF6650
-FF7700
-FF7750
-FF8800
-FF9900
-FFAA00
-FFBB00
-FFCC00
-FFDD00
-FFEE00
-FFFF00
-EEFF00
-DDFF00
-CCFF00
-BBFF00
-AAFF00
-99FF00
-88FF00
-77FF00
-66FF00
-55FF00
-44FF00
-33FF00
-22FF00
-11FF00
-00FF00"""
-
-'''
-heat_map = """CC0033
-FF0033
-FF3333
-FF6666
-FF9999
-99CC99
-66CC66
-669966
-339933
-006600"""
-'''
 
 def _get_polygons(criteria):
     polygons = []
     districts = _get_all_districts()
     map_colors = dict()
-    h = heat_map.split('\n')
+    legend = OrderedDict()
+    h = red_heat_map.split('\n')
+    log.debug(criteria)
     _s = sorted(criteria, key=criteria.get)
-    for i in range(len(_s)):
-        log.debug(_s[i])
-        map_colors[_s[i]] = h[i]
-    log.debug(map_colors)
+
+    for i in range(0, len(_s), 3):
+        legend[h[int(i/3)]] = "{} {}".format(criteria[_s[i]], criteria[_s[i+2]])
+        map_colors[_s[i]], map_colors[_s[i+1]], map_colors[_s[i+2]] = h[int(i/3)], h[int(i/3)], h[int(i/3)]
+    log.debug(legend)
 
     for district in districts:
         pol = {
@@ -888,7 +856,7 @@ def _get_polygons(criteria):
 
         polygons.append(pol)
 
-    return polygons
+    return polygons, legend
 
 
 if __name__ == '__main__':

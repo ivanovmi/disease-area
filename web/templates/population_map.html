@@ -309,47 +309,23 @@
         $$("views").back();
     }
     </script>
-{% endblock %}
 
-{% block content %}
+<script>
+    var c=document.getElementById("myLegend");
+var ctx=c.getContext("2d");
 
-<br>
+var x = 5;
+{% for c,b in legend.items() %}
+ctx.fillStyle="#{{ c }}";
+ctx.fillRect(x,5,50,20);
+ctx.font = "14px Arial";
+ctx.fillStyle="black";
+ctx.fillText("{{ b }}",x,50);
+x = x+70;
 
-{% include "_navigation.html" %}
+{% endfor %}
 
-<hr>
-        <div class="map-container" align="center">
-<!-- Отображение google карты -->
-    <table>
-    <tr>
-        <td>
-            <div id="map"></div>
-        </td>
-        <td>
-<div id="gmap-menu">
-</div>
-            <div id='legend_div' {% if dataset == {} %}style="display:none;"{% endif %}>
-            {{ dataset['min'] }}
-        <canvas id="legend" width="200" height="20" ></canvas>
-                {{ dataset['max'] }}
-        <script>
-            var c=document.getElementById("legend");
-            var ctx=c.getContext("2d");
-
-            var grd=ctx.createLinearGradient(0,0,170,0);
-            grd.addColorStop(0,"red");
-            grd.addColorStop(1,"green");
-
-            ctx.fillStyle=grd;
-            ctx.fillRect(15,15,150,15);
-        </script>
-    </div>
-        </td>
-    </tr>
-    </table>
-</div>
-
-    <canvas id="myChart" width="1210" height="300" {% if dataset == {} %}style="display:none;"{% endif %}></canvas>
+</script>
 <script>
 var ctx = document.getElementById("myChart");
 var l = [];
@@ -367,7 +343,7 @@ var dm = {
     marriage: 'Браки',
     divorce: 'Разводы',
     added: 'Прибывшие',
-    substituted: 'Выбывшие',
+    substituded: 'Выбывшие',
     diff: 'Миграционный прирост'
 };
 
@@ -413,6 +389,68 @@ var myLineChart = new Chart(ctx, {
         }
     }
 });
+
+$('th').append(dm["{{ dataset['label'] }}"]);
 </script>
+
+{% endblock %}
+
+{% block content %}
+
+<br>
+
+{% include "_navigation.html" %}
+
+<hr>
+        <div class="map-container" align="center">
+<!-- Отображение google карты -->
+    <table>
+    <tr>
+        <td>
+            <div id="map"></div>
+        </td>
+        <td>
+<div id="gmap-menu">
+</div>
+        </td>
+    </tr>
+    </table>
+</div>
+
+<table>
+    <tr>
+        <td>
+            <div id="legend" {% if dataset == {} %}style="display:none;"{% endif %}>
+                <canvas id="myLegend" width="870" height="100" ></canvas>
+                <table border="1">
+                    <tr>
+                        <th colspan="2">
+
+                        </th>
+                    </tr>
+                    {% for cr, cr1 in dataset['cr'].items() %}
+                      <tr>
+                          <td>
+                              {{ cr }}
+                          </td>
+                          <td>
+                              {{ cr1 }}
+                          </td>
+                      </tr>
+                    {% endfor %}
+        <tr>
+
+        </tr>
+    </table>
+            </div>
+        </td>
+        <td>
+<div>
+        <canvas id="myChart" width="370" height="300" {% if dataset == {} %}style="display:none;"{% endif %}></canvas>
+
+</div>
+        </td>
+    </tr>
+    </table>
 
 {% endblock %}
