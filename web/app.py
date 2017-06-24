@@ -209,7 +209,7 @@ def disease_map():
             criteria[i.district_id] = i.children + i.teenagers + i.adults
 
     if criteria != {}:
-        polygons = _get_polygons(criteria)
+        polygons, legend = _get_polygons(criteria)
     else:
         polygons = {}
 
