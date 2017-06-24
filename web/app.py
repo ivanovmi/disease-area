@@ -184,6 +184,7 @@ def disease_map():
 
     _json = request.args
     criteria = dict()
+    dataset = dict()
 
     years = {
         'first': [_get_year_by_id(x) for x in list(set([x.year_id for x in DiseasePopulation.query.order_by(DiseasePopulation.is_first).all() if x.is_first == 1]))],
@@ -205,17 +206,22 @@ def disease_map():
     if _json is not None:
         query = 'DiseasePopulation.query.filter_by(disease_id={}, is_first={}, year_id={}).all()'.format(_json['column'], 1 if _json['key'] == 'first' else 0, _json['year_id'])
         res = eval(query)
+        cr = dict()
         for i in res:
             criteria[i.district_id] = i.children + i.teenagers + i.adults
+            cr[_get_district_by_id(i.district_id)] = round(i.children + i.teenagers + i.adults, 2)
+
+        dataset['label'] = '{}'.format(_get_disease_by_id(_json['column']))
+        dataset['cr'] = cr
 
     if criteria != {}:
         polygons, legend = _get_polygons(criteria)
     else:
-        polygons = {}
+        polygons = legend = {}
 
     diseases = _get_all_diseases()
-    return render_template('disease_map.html', navigation=navigation,
-                           poly=polygons, years=years, diseases=diseases)
+    return render_template('disease_map.html', navigation=navigation, legend=legend,
+                           poly=polygons, years=years, diseases=diseases, dataset=dataset)
 
 
 @app.route('/population_map', methods=["GET", "POST"])
@@ -836,7 +842,7 @@ def _get_polygons(criteria):
     _s = sorted(criteria, key=criteria.get)
 
     for i in range(0, len(_s), 3):
-        legend[h[int(i/3)]] = "{} {}".format(criteria[_s[i]], criteria[_s[i+2]])
+        legend[h[int(i/3)]] = "{} {}".format(round(criteria[_s[i]], 2), round(criteria[_s[i+2]], 2))
         map_colors[_s[i]], map_colors[_s[i+1]], map_colors[_s[i+2]] = h[int(i/3)], h[int(i/3)], h[int(i/3)]
     log.debug(legend)
 

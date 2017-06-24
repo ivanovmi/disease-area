@@ -139,6 +139,40 @@
         $$("views").back();
     }
     </script>
+<script>
+    var c=document.getElementById("myLegend");
+var ctx=c.getContext("2d");
+
+var x = 5;
+{% for c,b in legend.items() %}
+ctx.fillStyle="#{{ c }}";
+ctx.fillRect(x,5,40,20);
+ctx.font = "10px Arial";
+ctx.fillStyle="black";
+ctx.fillText("{{ b }}",x-7,50);
+x = x+75;
+
+{% endfor %}
+
+</script>
+<script>
+var dm = {
+    city_population: 'Городское население',
+    all_population: 'Всего людей',
+    village_population: 'Cельское население',
+    died_under_1: 'Детей до года',
+    borned: 'Родившиеся',
+    died: 'Умершие',
+    marriage: 'Браки',
+    divorce: 'Разводы',
+    added: 'Прибывшие',
+    substituded: 'Выбывшие',
+    diff: 'Миграционный прирост'
+};
+
+$('th').append(dm["{{ dataset['label'] }}"]);
+</script>
+
 {% endblock %}
 
 {% block content %}
@@ -162,6 +196,30 @@
     </tr>
     </table>
 </div>
+
+<div id="legend" {% if dataset == {} %}style="display:none;"{% endif %}>
+                <canvas id="myLegend" width="870" height="100" ></canvas>
+                <table border="1">
+                    <tr>
+                        <th colspan="2">
+
+                        </th>
+                    </tr>
+                    {% for cr, cr1 in dataset['cr'].items() %}
+                      <tr>
+                          <td>
+                              {{ cr }}
+                          </td>
+                          <td>
+                              {{ cr1 }}
+                          </td>
+                      </tr>
+                    {% endfor %}
+        <tr>
+
+        </tr>
+    </table>
+            </div>
 
 <!--<div id="map"></div>-->
 
