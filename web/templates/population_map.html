@@ -88,7 +88,7 @@
                     { view:"select", label: "Год",  name:"year",  placeholder:"Год", options: [
                             {% for year in years['Population'] %}
                                 {
-                                    "id": {{ year.id}},
+                                    "id": {{ year.id }},
                                     "value": {{ year.year }}
                                 }{% if not loop.last %}, {% endif %}
                             {% endfor %}
@@ -314,13 +314,13 @@
     var c=document.getElementById("myLegend");
 var ctx=c.getContext("2d");
 
-var x = 5;
+var x = 10;
 {% for c,b in legend.items() %}
 ctx.fillStyle="#{{ c }}";
 ctx.fillRect(x,5,50,20);
-ctx.font = "14px Arial";
+ctx.font = "10px Arial";
 ctx.fillStyle="black";
-ctx.fillText("{{ b }}",x,50);
+ctx.fillText("{{ b }}",x-5,50);
 x = x+70;
 
 {% endfor %}
@@ -334,6 +334,19 @@ var l = [];
 {% endfor %}
 
 var dm = {
+    all: "Всего людей",
+    men: "Мужчин",
+    women: "Женщин",
+    children: "Детей",
+    adults: "Взрослых",
+    employable: "Трудоспособного возраста",
+    teenagers: "Подростков",
+    country_population: "Сельское население",
+    _15_17:"15-17 лет",
+    _18_24:"18-24 года",
+    _25_29:"25-29 лет",
+    _30_34:"30-34 лет",
+    _35_older:"35 лет и более",
     city_population: 'Городское население',
     all_population: 'Всего людей',
     village_population: 'Cельское население',
@@ -390,7 +403,9 @@ var myLineChart = new Chart(ctx, {
     }
 });
 
-$('th').append(dm["{{ dataset['label'] }}"]);
+$('th').append(dm["{{ dataset['label'] }}"]).append(" ({{ dataset['year'] }} г.)");
+document.getElementById("legend_head").colSpan = document.getElementById('legend_table').rows[1].cells.length;
+
 </script>
 
 {% endblock %}
@@ -416,28 +431,43 @@ $('th').append(dm["{{ dataset['label'] }}"]);
     </tr>
     </table>
 </div>
-
+{% if dataset['cr'] != [] %}
 <table>
     <tr>
         <td>
-            <div id="legend" {% if dataset == {} %}style="display:none;"{% endif %}>
-                <canvas id="myLegend" width="870" height="100" ></canvas>
-                <table border="1">
+            <div id="legend" >
+                <canvas id="myLegend" width="870" height="60" ></canvas>
+                <table id="legend_table" border="1 ">
                     <tr>
-                        <th colspan="2">
+                        <th id="legend_head">
 
                         </th>
                     </tr>
-                    {% for cr, cr1 in dataset['cr'].items() %}
+                    {% for el in range(0, 39, 3) %}
                       <tr>
                           <td>
-                              {{ cr }}
+                              {{ dataset['cr'][el][0] }}
                           </td>
                           <td>
-                              {{ cr1 }}
+                              {{ dataset['cr'][el][1] }}
+                          </td>
+
+                          <td>
+                              {{ dataset['cr'][el+1][0] }}
+                          </td>
+                          <td>
+                              {{ dataset['cr'][el+1][1] }}
+                          </td>
+
+                          <td>
+                              {{ dataset['cr'][el+2][0] }}
+                          </td>
+                          <td>
+                              {{ dataset['cr'][el+2][1] }}
                           </td>
                       </tr>
                     {% endfor %}
+
         <tr>
 
         </tr>
@@ -446,11 +476,11 @@ $('th').append(dm["{{ dataset['label'] }}"]);
         </td>
         <td>
 <div>
-        <canvas id="myChart" width="370" height="300" {% if dataset == {} %}style="display:none;"{% endif %}></canvas>
+        <canvas id="myChart" width="300" height="300" {% if dataset == {} %}style="display:none;"{% endif %}></canvas>
 
 </div>
         </td>
     </tr>
     </table>
-
+{% endif %}
 {% endblock %}

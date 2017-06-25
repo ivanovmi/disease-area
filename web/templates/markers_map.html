@@ -77,10 +77,11 @@
         },
         {view:'select',
         name: 'district',
+        label: "Район:",
         value:0, options: [
             {% for district in dist %}
                 {% if district.name=='--' %}
-                    {id:"0", value: "{{district.name}}" }
+                    {id:"0", value: "Все районы" }
                 {% else %}
                     {id:"{{district.id}}", value: "{{district.name}}" }
                 {% endif %}

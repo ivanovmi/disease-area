@@ -15,7 +15,6 @@ import os
 from config import Config
 from flask import Flask
 from flask import abort, request, render_template, redirect, session, url_for
-from flask_googlemaps import GoogleMaps, Map, icons
 
 from werkzeug.utils import secure_filename
 
@@ -50,7 +49,6 @@ navigation = ['markers_map', 'disease_map', 'population_map']
 
 style = "height:530px;width:870px;margin:0;"
 
-GoogleMaps(app, key=app.config['GMAPS_KEY'])
 
 
 @app.route('/login/', methods=['GET', 'POST'])
@@ -180,6 +178,7 @@ def disease_map():
             key = 'all'
         _json['column'] = request.form.get(key.lower())
         _json['key'] = key
+        _json['age'] = request.form.get('age')
         return redirect(url_for('disease_map')+'?{}'.format(_json))
 
     _json = request.args
@@ -203,16 +202,38 @@ def disease_map():
 
     log.debug(_json)
 
+    cr = dict()
     if _json is not None:
         query = 'DiseasePopulation.query.filter_by(disease_id={}, is_first={}, year_id={}).all()'.format(_json['column'], 1 if _json['key'] == 'first' else 0, _json['year_id'])
         res = eval(query)
-        cr = dict()
-        for i in res:
-            criteria[i.district_id] = i.children + i.teenagers + i.adults
-            cr[_get_district_by_id(i.district_id)] = round(i.children + i.teenagers + i.adults, 2)
 
-        dataset['label'] = '{}'.format(_get_disease_by_id(_json['column']))
-        dataset['cr'] = cr
+        for i in res:
+            if int(_json['age']) == 1:
+                log.debug('children')
+                criteria[i.district_id] = i.children
+                cr[_get_district_by_id(i.district_id)] = round(i.children, 2)
+                dataset['age'] = 'дети'
+            elif int(_json['age']) == 2:
+                log.debug('teens')
+                criteria[i.district_id] = i.teenagers
+                cr[_get_district_by_id(i.district_id)] = round(i.teenagers, 2)
+                dataset['age'] = 'подростки'
+            elif int(_json['age']) == 3:
+                log.debug('adult')
+                criteria[i.district_id] = i.adults
+                cr[_get_district_by_id(i.district_id)] = round(i.adults, 2)
+                dataset['age'] = 'взрослые'
+            elif int(_json['age']) == 4:
+                log.debug('all')
+                criteria[i.district_id] = i.children + i.teenagers + i.adults
+                cr[_get_district_by_id(i.district_id)] = round(i.children + i.teenagers + i.adults, 2)
+                dataset['age'] = 'общий показатель'
+
+        dataset['label'] = '{}'.format(_get_disease_by_id(_json['column']).name)
+        dataset['year'] = '{}'.format(_get_year_by_id(_json['year_id']).year)
+
+    cr = list(cr.items())
+    dataset['cr'] = cr
 
     if criteria != {}:
         polygons, legend = _get_polygons(criteria)
@@ -250,9 +271,9 @@ def population_map():
     criteria = dict()
     dataset = dict()
     years = {
-        'Population': list(map(str, list(set([x.year_id for x in
-                                              Population.query.order_by(
-                                                  Population.year).all()])))),
+        'Population': [_get_year_by_id(x) for x in list(set([x.year_id for x in
+                                                            Population.query.order_by(
+                                                                Population.year_id).all()]))],
         'Nathality': [_get_year_by_id(x) for x in list(set([x.year_id for x in
                                                             Nathality.query.order_by(
                                                                 Nathality.year_id).all()]))],
@@ -331,6 +352,8 @@ def population_map():
         dataset['label'] = mapping[_json['key']][_json['column']]
         dataset['labels'] = years[_json['key']]
         dataset['data'] = []
+        dataset['year'] = _get_year_by_id(_json['year_id']).year
+
         for year in years[_json['key']]:
             query = '{}.query.filter_by(year_id={}).all()'.format(_json['key'],
                                                                   year.id)
@@ -340,6 +363,7 @@ def population_map():
             dataset['min'] = min(data)
             dataset['max'] = max(data)
 
+    cr = list(cr.items())
     dataset['cr'] = cr
 
     log.debug(dataset)
@@ -348,6 +372,8 @@ def population_map():
         polygons, legend = _get_polygons(criteria)
     else:
         polygons = legend = {}
+
+    log.debug(years)
 
     return render_template('population_map.html', navigation=navigation, legend=legend,
                            years=years, poly=polygons, dataset=dataset)
@@ -613,8 +639,12 @@ def population():
                                  secure_filename(f.filename)),
                     all_districts)
                 for i in popul:
-                    log.debug(i)
+                    log.debug(i['year'])
                     add_new_year(year=i["year"])
+
+                    i["year_id"] = Year.query.filter_by(
+                        year=i["year"]).first().id
+                    del i["year"]
 
                     db.session.add(Population(**i))
 
@@ -775,7 +805,6 @@ def _get_markers():
     hospitals = _get_all_hospitals()
     for hospital in hospitals:
         h = dict()
-        h['icon'] = icons.dots.red
         # Получаем долготу(lng) и широту(lat)
         h['lng'], h['lat'] = hospital.coordinates.split('; ')
         h['infobox'] = ("{}<br><b>Адрес:</b> {}"
@@ -800,7 +829,6 @@ def _get_selected_markers():
     hospitals = _get_all_hospitals()
     for hospital in hospitals:
         h = dict()
-        h['icon'] = icons.dots.red
         # Получаем долготу(lng) и широту(lat)
         h['lng'], h['lat'] = hospital.coordinates.split('; ')
         h['infobox'] = ("{}<br><b>Адрес:</b> {}"
@@ -827,9 +855,9 @@ FF6868
 FF4949
 FE2C2C
 FF1212
-FF1313
-FF1414
-FF1515"""
+CB3333
+A62929
+7B1818"""
 
 
 def _get_polygons(criteria):
@@ -842,7 +870,7 @@ def _get_polygons(criteria):
     _s = sorted(criteria, key=criteria.get)
 
     for i in range(0, len(_s), 3):
-        legend[h[int(i/3)]] = "{} {}".format(round(criteria[_s[i]], 2), round(criteria[_s[i+2]], 2))
+        legend[h[int(i/3)]] = "{}  {}".format(int(round(criteria[_s[i]], 0)), int(round(criteria[_s[i+2]], 0)))
         map_colors[_s[i]], map_colors[_s[i+1]], map_colors[_s[i+2]] = h[int(i/3)], h[int(i/3)], h[int(i/3)]
     log.debug(legend)
 

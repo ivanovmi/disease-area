@@ -78,7 +78,8 @@ class DiseasePopulation(db.Model):
 
 class Population(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    year = db.Column(db.Integer)
+    year = db.Column(db.Integer, nullable=True)
+    year_id = db.Column(db.Integer)
     all = db.Column(db.Integer)
     men = db.Column(db.Integer)
     women = db.Column(db.Integer)

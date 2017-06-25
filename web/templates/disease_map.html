@@ -55,7 +55,7 @@
                     {
                         view:"radio",
                         width:300,
-                        height: 1050,
+                        height: 550,
                         vertical: true,
                         name:"first",
                         options: [
@@ -64,7 +64,32 @@
                         {% endfor %}
                         ]
                     },
-                    { view:"select", label: "Год",  name:"year",  placeholder:"Год", options: [
+                    {
+                        view:"select",
+                        label: "Возраст",
+                        name:"age",
+                        width: 250,
+                        placeholder:"Возраст",
+                        options: [
+                                {
+                                    "id": 1,
+                                    "value": "Дети"
+                                },
+                                {
+                                    "id": 2,
+                                    "value": "Подростки"
+                                },
+                                {
+                                    "id": 3,
+                                    "value": "Взрослые"
+                                },
+                                {
+                                    "id": 4,
+                                    "value": "Общий"
+                                }
+                        ], labelWidth: 70},
+                    { view:"select", width: 250,
+                    label: "Год",  name:"year",  placeholder:"Год", options: [
                             {% for year in years['first'] %}
                                 {
                                     "id": {{ year.id}},
@@ -73,8 +98,8 @@
                             {% endfor %}
                         ], labelWidth: 70},
                     { margin:5, cols:[
-                        { view:"button", value:"Назад" , click:"cancel()" },
-                        { view:"button", value:"Показать", type:"form", click:"submit('formView'.concat('Первичная'))" }
+                        { view:"button", width: 130, value:"Назад" , click:"cancel()" },
+                        { view:"button", width: 130, value:"Показать", type:"form", click:"submit('formView'.concat('Первичная'))" }
                     ]},
 	                {}
                 ]
@@ -87,7 +112,7 @@
                     {
                         view:"radio",
                         width:300,
-                        height: 1050,
+                        height: 550,
                         vertical: true,
                         name:"all",
                         options: [
@@ -96,7 +121,32 @@
                         {% endfor %}
                         ]
                     },
-                    { view:"select", label: "Год",  name:"year",  placeholder:"Год", width: 300, options: [
+                    {
+                        view:"select",
+                        label: "Возраст",
+                        width: 250,
+                        name:"age",
+                        placeholder:"Возраст",
+                        options: [
+                                {
+                                    "id": 1,
+                                    "value": "Дети"
+                                },
+                                {
+                                    "id": 2,
+                                    "value": "Подростки"
+                                },
+                                {
+                                    "id": 3,
+                                    "value": "Взрослые"
+                                },
+                                {
+                                    "id": 4,
+                                    "value": "Общий"
+                                }
+                        ], labelWidth: 70},
+                    { view:"select",
+                     width: 250, label: "Год",  name:"year",  placeholder:"Год", width: 300, options: [
                             {% for year in years['all'] %}
                                 {
                                     "id": {{ year.id}},
@@ -105,8 +155,8 @@
                             {% endfor %}
                         ], labelWidth: 40},
                     { margin:5, cols:[
-                        { view:"button", value:"Назад" , click:"cancel()" },
-                        { view:"button", value:"Показать", type:"form", click:"submit('formView'.concat('Общая'))"}
+                        { view:"button", width: 130, value:"Назад" , click:"cancel()" },
+                        { view:"button", width: 130, value:"Показать", type:"form", click:"submit('formView'.concat('Общая'))"}
                     ]}]}]});
      /*
      binds Form with List:
@@ -142,35 +192,23 @@
 <script>
     var c=document.getElementById("myLegend");
 var ctx=c.getContext("2d");
-
-var x = 5;
+var x = 10;
 {% for c,b in legend.items() %}
 ctx.fillStyle="#{{ c }}";
 ctx.fillRect(x,5,40,20);
 ctx.font = "10px Arial";
 ctx.fillStyle="black";
-ctx.fillText("{{ b }}",x-7,50);
-x = x+75;
+ctx.fillText("{{ b }}",x-5,50);
+x = x+70;
 
 {% endfor %}
 
 </script>
 <script>
-var dm = {
-    city_population: 'Городское население',
-    all_population: 'Всего людей',
-    village_population: 'Cельское население',
-    died_under_1: 'Детей до года',
-    borned: 'Родившиеся',
-    died: 'Умершие',
-    marriage: 'Браки',
-    divorce: 'Разводы',
-    added: 'Прибывшие',
-    substituded: 'Выбывшие',
-    diff: 'Миграционный прирост'
-};
 
-$('th').append(dm["{{ dataset['label'] }}"]);
+$('th').append("{{ dataset['label'] }} ({{ dataset['year'] }} г., {{ dataset['age'] }})");
+document.getElementById("legend_head").colSpan = document.getElementById('legend_table').rows[1].cells.length;
+
 </script>
 
 {% endblock %}
@@ -196,22 +234,36 @@ $('th').append(dm["{{ dataset['label'] }}"]);
     </tr>
     </table>
 </div>
-
-<div id="legend" {% if dataset == {} %}style="display:none;"{% endif %}>
-                <canvas id="myLegend" width="870" height="100" ></canvas>
-                <table border="1">
+{% if dataset['cr'] != [] %}
+<div id="legend">
+                <canvas id="myLegend" width="870" height="60" ></canvas>
+                <table id="legend_table" border="1">
                     <tr>
-                        <th colspan="2">
+                        <th id="legend_head">
 
                         </th>
                     </tr>
-                    {% for cr, cr1 in dataset['cr'].items() %}
+                    {% for el in range(0, 39, 3) %}
                       <tr>
                           <td>
-                              {{ cr }}
+                              {{ dataset['cr'][el][0] }}
                           </td>
                           <td>
-                              {{ cr1 }}
+                              {{ dataset['cr'][el][1] }}
+                          </td>
+
+                          <td>
+                              {{ dataset['cr'][el+1][0] }}
+                          </td>
+                          <td>
+                              {{ dataset['cr'][el+1][1] }}
+                          </td>
+
+                          <td>
+                              {{ dataset['cr'][el+2][0] }}
+                          </td>
+                          <td>
+                              {{ dataset['cr'][el+2][1] }}
                           </td>
                       </tr>
                     {% endfor %}
@@ -220,7 +272,7 @@ $('th').append(dm["{{ dataset['label'] }}"]);
         </tr>
     </table>
             </div>
-
+{% endif %}
 <!--<div id="map"></div>-->
 
 {% endblock %}

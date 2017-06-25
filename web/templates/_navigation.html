@@ -22,7 +22,7 @@
         </li>
     {% else %}
     <li role="presentation" style="float: right;" class="btn">
-        <a href="{{ url_for('login') }}">Вход</a>
+        <a href="{{ url_for('login') }}"><i class="fa fa-sign-in" aria-hidden="true" style="font-size:25px"></i></a>
     </li>
     {% endif %}
     {% if 'username' in session %}

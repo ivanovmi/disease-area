@@ -145,7 +145,7 @@ def parse_population(xls_file, districts):
             district_id = 3
         result["district_id"] = district_id
 
-        result["all"], result["men"], result["women"], result["children"], result["teenagers"], result["adults"], result["employable"], result["employable_men"], result["employable_women"] = r[1], r[2], r[3], r[4]+r[5]+r[8], r[7], r[11], r[12], r[13]
+        result["all"], result["men"], result["women"], result["children"], result["teenagers"], result["adults"], result["employable"], result["country_population"] = r[1], r[2], r[3], r[4], r[5], r[6], r[7], r[8]
 
         results.append(result)
     return results

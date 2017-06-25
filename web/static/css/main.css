@@ -12,16 +12,26 @@ body{
   max-width: 100% !important;
 }
 
+h2 {
+  color: #337ab7;
+  text-align: center;
+}
+
 #myLegend {
   margin 5px;
   padding: 5px;
 }
 
+#legend_table {
+  width: 870px;
+  border: 1px solid #dcdcdc;
+}
+
 #gmap-menu {
   max-height: 550px;
   min-height: 550px;
-  min-width: 370px;
-  max-width: 370px;
+  min-width: 300px;
+  max-width: 300px;
   overflow: hidden;
   margin-left: 8px;
 }
