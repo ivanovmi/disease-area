@@ -211,22 +211,22 @@ def disease_map():
             if int(_json['age']) == 1:
                 log.debug('children')
                 criteria[i.district_id] = i.children
-                cr[_get_district_by_id(i.district_id)] = round(i.children, 2)
+                cr[_get_district_by_id(i.district_id)] = int(round(i.children, 0))
                 dataset['age'] = 'дети'
             elif int(_json['age']) == 2:
                 log.debug('teens')
                 criteria[i.district_id] = i.teenagers
-                cr[_get_district_by_id(i.district_id)] = round(i.teenagers, 2)
+                cr[_get_district_by_id(i.district_id)] = int(round(i.teenagers, 0))
                 dataset['age'] = 'подростки'
             elif int(_json['age']) == 3:
                 log.debug('adult')
                 criteria[i.district_id] = i.adults
-                cr[_get_district_by_id(i.district_id)] = round(i.adults, 2)
+                cr[_get_district_by_id(i.district_id)] = int(round(i.adults, 0))
                 dataset['age'] = 'взрослые'
             elif int(_json['age']) == 4:
                 log.debug('all')
                 criteria[i.district_id] = i.children + i.teenagers + i.adults
-                cr[_get_district_by_id(i.district_id)] = round(i.children + i.teenagers + i.adults, 2)
+                cr[_get_district_by_id(i.district_id)] = int(round(i.children + i.teenagers + i.adults, 0))
                 dataset['age'] = 'общий показатель'
 
         dataset['label'] = '{}'.format(_get_disease_by_id(_json['column']).name)
